@@ -1,0 +1,22 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(514,5): warning MSB8028: промежуточный каталог (x64\Release\) содержит файлы, которые используются совместно с другим проектом (lab2_dx11.vcxproj).  Это может привести к ошибкам очистки и перестроения.
+  compilation object save succeeded; see C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\x64\Release\vertexShader.cso
+  camera.cpp
+  input.cpp
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(9,11): warning C4101: point: неиспользованная локальная переменная
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(59,38): warning C4244: аргумент: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(58,38): warning C4244: аргумент: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(73,18): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(74,18): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(75,21): warning C4838: Преобразование из "float" в "LONG" требует сужающего преобразования.
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(75,21): warning C4244: инициализация: преобразование "float" в "LONG", возможна потеря данных
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(75,29): warning C4838: Преобразование из "float" в "LONG" требует сужающего преобразования.
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\input.cpp(75,29): warning C4244: инициализация: преобразование "float" в "LONG", возможна потеря данных
+  lab1_dx11.cpp
+  rendering.cpp
+  Создание кода
+  Previous IPDB not found, fall back to full compilation.
+  All 241 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Создание кода завершено
+  lab2_dx11.vcxproj -> C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\x64\Release\lab1_dx11.exe
+  Скопировано файлов:         1.
+  Скопировано файлов:         1.

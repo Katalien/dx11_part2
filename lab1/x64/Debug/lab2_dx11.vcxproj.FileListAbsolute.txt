@@ -1,0 +1,6 @@
+C:\Users\z.kate\source\GitHubRepos\dx11\lab2_dx11\x64\Debug\lab2_dx11.exe
+C:\Users\z.kate\source\GitHubRepos\dx11\lab2_dx11\x64\Debug\vertexShader.cso
+C:\Users\z.kate\source\GitHubRepos\dx11\lab2_dx11\x64\Debug\pixelShader.hlsl
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\x64\Debug\vertexShader.cso
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\x64\Debug\pixelShader.hlsl
+C:\Users\z.kate\source\GitHubRepos\dx11_part2\lab1\x64\Debug\lab1_dx11.exe
