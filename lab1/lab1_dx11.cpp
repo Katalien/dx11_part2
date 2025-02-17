@@ -130,6 +130,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+
+    case WM_MOUSEWHEEL: {
+        short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+        if (pRenderer) {
+            pRenderer->HandleMouseWheel(static_cast<float>(wheelDelta) / WHEEL_DELTA);
+        }
+        return 0;
+    }
+
+    case WM_KEYDOWN: {
+        char key = static_cast<char>(wParam); // Получаем код клавиши
+        if (pRenderer && pRenderer->GetCamera()) {
+            pRenderer->GetCamera()->KeyPressed(key); // Передаём нажатие клавиши в камеру
+        }
+        break;
+    }
+
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
