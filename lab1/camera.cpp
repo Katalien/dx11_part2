@@ -1,10 +1,16 @@
 #include "camera.h"
+#include <algorithm>
+#include <iostream>
 
 HRESULT Camera::Init() {
     m_pointOfInterest = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_distanceToPoint = 6.0f;
     m_phi = -XM_PIDIV4;
     m_theta = XM_PIDIV4;
+
+    m_mouseSensitivity = 0.01f; // Чувствительность мыши
+    m_wheelSensitivity = 0.1f;  // Чувствительность колеса мыши
+
     return S_OK;
 }
 
@@ -24,11 +30,52 @@ void Camera::Frame() {
 }
 
 void Camera::MouseMoved(float dx, float dy, float wheel) {
-    m_phi += dx / 100.0f;
-    m_theta += dy / 100.0f;
+    // Отладочный вывод
+    std::cout << "MouseMoved: dx=" << dx << ", dy=" << dy << ", wheel=" << wheel << std::endl;
+
+    m_phi += dx * m_mouseSensitivity;
+    m_theta += dy * m_mouseSensitivity;
+
     m_theta = min(max(m_theta, -XM_PIDIV2), XM_PIDIV2);
-    m_distanceToPoint -= wheel / 100.0f;
-    if (m_distanceToPoint < 1.0f) {
-        m_distanceToPoint = 1.0f;
+
+    m_distanceToPoint -= wheel * m_wheelSensitivity;
+    m_distanceToPoint = max(m_distanceToPoint, 1.0f);
+}
+
+void Camera::SetMouseSensitivity(float sensitivity) {
+    m_mouseSensitivity = sensitivity;
+}
+
+void Camera::SetWheelSensitivity(float sensitivity) {
+    m_wheelSensitivity = sensitivity;
+}
+
+void Camera::KeyPressed(char key) {
+    float moveSpeed = 0.1f;
+    switch (key) {
+    case 'W':
+    case 'w':
+        m_pointOfInterest.z += moveSpeed;
+        break;
+    case 'S':
+    case 's':
+        m_pointOfInterest.z -= moveSpeed;
+        break;
+    case 'A':
+    case 'a':
+        m_pointOfInterest.x -= moveSpeed;
+        break;
+    case 'D':
+    case 'd':
+        m_pointOfInterest.x += moveSpeed;
+        break;
+    case 'Q':
+    case 'q':
+        m_pointOfInterest.y -= moveSpeed;
+        break;
+    case 'E':
+    case 'e':
+        m_pointOfInterest.y += moveSpeed;
+        break;
     }
 }
