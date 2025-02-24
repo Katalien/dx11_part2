@@ -8,6 +8,8 @@
 #include "Vertex.hpp"
 #include "camera.h"
 #include "input.h"
+#include "hdr.h"
+#include "light.h"
 
 using namespace DirectX;
 
@@ -65,4 +67,7 @@ private:
 
     Camera* m_pCamera = nullptr;
     Input* m_pInput = nullptr;
+
+    LightManager m_lightManager;
+    HDR m_hdr;
 };

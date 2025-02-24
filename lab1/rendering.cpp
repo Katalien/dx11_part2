@@ -1,7 +1,10 @@
 #include "rendering.h"
 #include <assert.h>
+#include <iostream>
+#include <string>
 
 #define SAFE_RELEASE(a) if (a != NULL) { a->Release(); a = NULL; }
+
 
 bool Renderer::Init(HINSTANCE hInstance, HWND hWnd) {
     HRESULT hr;
@@ -161,29 +164,15 @@ bool Renderer::Resize(UINT width, UINT height) {
 }
 
 bool Renderer::Render() {
-    m_pContext->ClearState();
-    ID3D11RenderTargetView* views[] = { m_pBackBufferRTV };
-    m_pContext->OMSetRenderTargets(1, views, nullptr);
-    static const FLOAT BackColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    m_pContext->ClearRenderTargetView(m_pBackBufferRTV, BackColor);
-    D3D11_VIEWPORT viewport;
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.Width = (FLOAT)m_width;
-    viewport.Height = (FLOAT)m_height;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-    m_pContext->RSSetViewports(1, &viewport);
+    // Устанавливаем HDR-текстуру как цель рендеринга
+    ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
+    m_pContext->OMSetRenderTargets(1, &hdrRTV, nullptr);
 
-    D3D11_RECT rect;
-    rect.left = 0;
-    rect.top = 0;
-    rect.right = m_width;
-    rect.bottom = m_height;
-    m_pContext->RSSetScissorRects(1, &rect);
+    // Очистка HDR-текстуры
+    static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
 
-    m_pContext->RSSetState(m_pRasterizerState);
-
+    // Рендеринг сцены в HDR-текстуру
     m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     ID3D11Buffer* vertexBuffers[] = { m_pVertexBuffer };
     UINT strides[] = { 16 };
@@ -197,6 +186,11 @@ bool Renderer::Render() {
     m_pContext->VSSetConstantBuffers(1, 1, &m_pSceneMatrixBuffer);
     m_pContext->DrawIndexed(36, 0, 0);
 
+    // Применение Tone Mapping
+    m_pContext->OMSetRenderTargets(1, &m_pBackBufferRTV, nullptr);
+    m_hdr.Render(m_pContext, m_hdr.GetHDRTexture());
+
+    // Презентация
     HRESULT hr = m_pSwapChain->Present(0, 0);
     assert(SUCCEEDED(hr));
 
@@ -219,14 +213,14 @@ HRESULT Renderer::InitScene() {
     HRESULT hr = S_OK;
 
     static const Vertex Vertices[] = {
-    { -1.0f, 1.0f, -1.0f, RGB(100, 0, 255) },
-    { 1.0f, 1.0f, -1.0f, RGB(0, 155, 255) },
-    { 1.0f, 1.0f, 1.0f, RGB(0, 0, 255) },
-    { -1.0f, 1.0f, 1.0f, RGB(255, 0, 255) },
-    { -1.0f, -1.0f, -1.0f, RGB(255, 0, 155) },
-    { 1.0f, -1.0f, -1.0f, RGB(255, 0, 150) },
-    { 1.0f, -1.0f, 1.0f, RGB(255, 100, 255) },
-    { -1.0f, -1.0f, 1.0f, RGB(160, 80, 90) }
+    { XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT4(0.39f, 0.0f, 1.0f, 1.0f) },       // RGB(100, 0, 255)
+    { XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT4(0.0f, 0.61f, 1.0f, 1.0f) },        // RGB(0, 155, 255)
+    { XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },          // RGB(0, 0, 255)
+    { XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) },         // RGB(255, 0, 255)
+    { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 0.0f, 0.61f, 1.0f) },      // RGB(255, 0, 155)
+    { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 0.0f, 0.59f, 1.0f) },      // RGB(255, 0, 150)
+    { XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(1.0f, 0.39f, 1.0f, 1.0f) },       // RGB(255, 100, 255)
+    { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT4(0.63f, 0.31f, 0.35f, 1.0f) }     // RGB(160, 80, 90)
     };
 
 
@@ -251,7 +245,8 @@ HRESULT Renderer::InitScene() {
     };
     static const D3D11_INPUT_ELEMENT_DESC InputDesc[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"COLOR", 0,  DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0} };
+    {"COLOR", 0,  DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0} };
 
     if (SUCCEEDED(hr)) {
         D3D11_BUFFER_DESC desc = {};
@@ -361,6 +356,9 @@ HRESULT Renderer::InitScene() {
         hr = m_pDevice->CreateRasterizerState(&desc, &m_pRasterizerState);
         assert(SUCCEEDED(hr));
     }
+
+    m_lightManager.Init(m_pDevice);
+    m_hdr.Init(m_pDevice, m_width, m_height);
 
     return hr;
 }
