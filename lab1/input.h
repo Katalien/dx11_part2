@@ -20,8 +20,12 @@ public:
     XMFLOAT3 IsMouseUsed();
     void Resize(int screenWidth, int screenHeight);
 
+   
+
 private:
     //bool ReadKeyboard();
+
+
     bool ReadMouse();
     void CountDelta(POINT const& cursor);
     XMFLOAT3 PointToXMFLOAT3(POINT const& cursor);
