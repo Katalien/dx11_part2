@@ -10,6 +10,7 @@ HDR::~HDR() {
     if (m_pHDRRTV) m_pHDRRTV->Release();
     if (m_pHDRSRV) m_pHDRSRV->Release();
     if (m_pToneMappingPS) m_pToneMappingPS->Release();
+    if (m_pToneMappingVS) m_pToneMappingVS->Release();
 }
 
 bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
@@ -40,6 +41,14 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
 
     hr = device->CreatePixelShader(pShaderBlob->GetBufferPointer(), pShaderBlob->GetBufferSize(), nullptr, &m_pToneMappingPS);
     pShaderBlob->Release();
+    if (FAILED(hr)) return false;
+
+    ID3D10Blob* vShaderBlob = nullptr;
+    hr = D3DCompileFromFile(L"defaultVertexShader.hlsl", nullptr, nullptr, "main", "vs_5_0", 0, 0, &vShaderBlob, nullptr);
+    if (FAILED(hr)) return false;
+
+    hr = device->CreateVertexShader(vShaderBlob->GetBufferPointer(), vShaderBlob->GetBufferSize(), nullptr, &m_pToneMappingVS);
+    vShaderBlob->Release();
     if (FAILED(hr)) return false;
 
     return true;

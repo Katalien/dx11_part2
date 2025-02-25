@@ -18,6 +18,7 @@ private:
     ID3D11RenderTargetView* m_pHDRRTV;
     ID3D11ShaderResourceView* m_pHDRSRV;
     ID3D11PixelShader* m_pToneMappingPS;
+    ID3D11VertexShader* m_pToneMappingVS;
 };
 
 #endif // HDR_H
