@@ -164,6 +164,7 @@ bool Renderer::Resize(UINT width, UINT height) {
 }
 
 bool Renderer::Render() {
+//    m_pContext->ClearState();
     // Устанавливаем HDR-текстуру как цель рендеринга
     ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
     m_pContext->OMSetRenderTargets(1, &hdrRTV, nullptr);
@@ -171,6 +172,7 @@ bool Renderer::Render() {
     // Очистка HDR-текстуры
     static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
+    m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
 
     // Рендеринг сцены в HDR-текстуру
     m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
@@ -191,10 +193,6 @@ bool Renderer::Render() {
     m_pContext->OMSetRenderTargets(1, &m_pBackBufferRTV, nullptr);
     m_hdr.Render(m_pContext, m_hdr.GetHDRTexture());
 
-    // Презентация
-    HRESULT hr = m_pSwapChain->Present(0, 0);
-    assert(SUCCEEDED(hr));
-
 
     m_pContext->IASetVertexBuffers(0, 1, vertexBuffers, strides, offsets);
     m_pContext->IASetInputLayout(m_pInputLayout);
@@ -205,7 +203,9 @@ bool Renderer::Render() {
     m_pContext->VSSetConstantBuffers(1, 1, &m_pSceneMatrixBuffer);
     m_pContext->DrawIndexed(36, 0, 0);
 
-    
+    // Презентация
+    HRESULT hr = m_pSwapChain->Present(0, 0);
+    assert(SUCCEEDED(hr));
 
     return SUCCEEDED(hr);
 }
