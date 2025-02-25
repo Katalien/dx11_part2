@@ -49,7 +49,7 @@ void HDR::Render(ID3D11DeviceContext* context, ID3D11ShaderResourceView* sourceT
     // Применение Tone Mapping
     context->PSSetShader(m_pToneMappingPS, nullptr, 0);
     context->PSSetShaderResources(0, 1, &sourceTexture);
-    context->Draw(3, 0);
+    context->Draw(4, 0);
 }
 
 ID3D11ShaderResourceView* HDR::GetHDRTexture() const {

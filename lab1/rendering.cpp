@@ -175,8 +175,27 @@ bool Renderer::Render() {
     // Рендеринг сцены в HDR-текстуру
     m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     ID3D11Buffer* vertexBuffers[] = { m_pVertexBuffer };
-    UINT strides[] = { 16 };
+    UINT strides[] = { sizeof(Vertex) }; // Исправлено
     UINT offsets[] = { 0 };
+
+    D3D11_VIEWPORT viewport = {};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = static_cast<float>(m_width);
+    viewport.Height = static_cast<float>(m_height);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    m_pContext->RSSetViewports(1, &viewport);
+
+    // Применение Tone Mapping
+    m_pContext->OMSetRenderTargets(1, &m_pBackBufferRTV, nullptr);
+    m_hdr.Render(m_pContext, m_hdr.GetHDRTexture());
+
+    // Презентация
+    HRESULT hr = m_pSwapChain->Present(0, 0);
+    assert(SUCCEEDED(hr));
+
+
     m_pContext->IASetVertexBuffers(0, 1, vertexBuffers, strides, offsets);
     m_pContext->IASetInputLayout(m_pInputLayout);
     m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -186,13 +205,7 @@ bool Renderer::Render() {
     m_pContext->VSSetConstantBuffers(1, 1, &m_pSceneMatrixBuffer);
     m_pContext->DrawIndexed(36, 0, 0);
 
-    // Применение Tone Mapping
-    m_pContext->OMSetRenderTargets(1, &m_pBackBufferRTV, nullptr);
-    m_hdr.Render(m_pContext, m_hdr.GetHDRTexture());
-
-    // Презентация
-    HRESULT hr = m_pSwapChain->Present(0, 0);
-    assert(SUCCEEDED(hr));
+    
 
     return SUCCEEDED(hr);
 }
@@ -246,7 +259,9 @@ HRESULT Renderer::InitScene() {
     static const D3D11_INPUT_ELEMENT_DESC InputDesc[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
     {"COLOR", 0,  DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0} };
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0} // Исправлено
+    };
+
 
     if (SUCCEEDED(hr)) {
         D3D11_BUFFER_DESC desc = {};
