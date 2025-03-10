@@ -9,5 +9,5 @@ using namespace DirectX;
 struct Vertex {
     XMFLOAT3 position; // 12 байт
     XMFLOAT4 color;    // 16 байт
-//    XMFLOAT2 uv;       // 8 байт (TEXCOORD)
+    XMFLOAT2 uv;       // 8 байт (TEXCOORD)
 };

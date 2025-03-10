@@ -21,6 +21,18 @@ struct SceneMatrixBuffer {
     XMMATRIX mViewProjectionMatrix;
 };
 
+//struct TransformBuffer {
+//    XMMATRIX worldMatrix;         // 64 bytes
+//    XMMATRIX viewProjectionMatrix; // 64 bytes
+//    XMMATRIX worldViewProj;       // 64 bytes (если нужно)
+//}; // Всего 192 bytes
+#pragma pack(push, 16)
+struct TransformBuffer {
+    XMMATRIX worldViewProj;  // Матрица вида-проекции (view * projection)
+    XMMATRIX worldMatrix;    // Мировая матрица объекта
+};
+#pragma pack(pop)
+
 class Renderer {
 public:
 
@@ -65,6 +77,9 @@ private:
 
     ID3D11Buffer* m_pWorldMatrixBuffer = nullptr;
     ID3D11Buffer* m_pSceneMatrixBuffer = nullptr;
+
+    ID3D11Buffer* m_pTransformBuffer;
+
     ID3D11RasterizerState* m_pRasterizerState = nullptr;
 
     Camera* m_pCamera = nullptr;

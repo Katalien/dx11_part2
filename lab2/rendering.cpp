@@ -167,23 +167,27 @@ bool Renderer::Resize(UINT width, UINT height) {
 }
 
 bool Renderer::Render() {
-    // Очистка заднего буфера
-    static const FLOAT clearColor[4] = { 1.0f, 0.2f, 0.5f, 1.0f };
+    //                       
+    static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
 
-    // Отвязываем ресурсы от входных слотов шейдера
+    //                                             
     ID3D11ShaderResourceView* nullSRV = nullptr;
     m_pContext->PSSetShaderResources(0, 1, &nullSRV);
 
-    // Устанавливаем HDR-текстуру как цель рендеринга
-    ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
+    //               HDR-                            
+    /*ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
     ID3D11RenderTargetView* renderTargets[] = { hdrRTV };
+    m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);*/
+
+    ID3D11RenderTargetView* renderTargets[] = { m_pBackBufferRTV };
     m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);
 
-    // Очистка HDR-текстуры
-    m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
+    //         HDR-        
+    m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
+    //m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
 
-    // Создаем и привязываем сэмплер
+    //                              
     ComPtr<ID3D11SamplerState> pSamplerState;
     D3D11_SAMPLER_DESC samplerDesc = {};
     samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -200,26 +204,29 @@ bool Renderer::Render() {
     }
     m_pContext->PSSetSamplers(0, 1, pSamplerState.GetAddressOf());
 
-    // Устанавливаем вершинный и индексный буферы
+    //                                           
     m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     ID3D11Buffer* vertexBuffers[] = { m_pVertexBuffer };
     UINT strides[] = { sizeof(Vertex) };
     UINT offsets[] = { 0 };
     m_pContext->IASetVertexBuffers(0, 1, vertexBuffers, strides, offsets);
 
-    // Устанавливаем входной макет и топологию
+    //                                        
     m_pContext->IASetInputLayout(m_pInputLayout);
     m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // Устанавливаем шейдеры
+    //                      
     m_pContext->VSSetShader(m_pVertexShader, nullptr, 0);
     m_pContext->PSSetShader(m_pPixelShader, nullptr, 0);
 
-    // Устанавливаем константные буферы
-    ID3D11Buffer* constantBuffers[] = { m_pWorldMatrixBuffer, m_pSceneMatrixBuffer };
+    //                                 
+    ID3D11Buffer* constantBuffers[] = { m_pSceneMatrixBuffer, m_pWorldMatrixBuffer };
     m_pContext->VSSetConstantBuffers(0, 2, constantBuffers);
 
-    // Устанавливаем вьюпорт
+    ID3D11Buffer* lightBuffer = m_lightManager.GetLightBuffer();
+    m_pContext->PSSetConstantBuffers(2, 1, &lightBuffer); //         b2
+
+    //                      
     D3D11_VIEWPORT viewport = {};
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
@@ -229,19 +236,19 @@ bool Renderer::Render() {
     viewport.MaxDepth = 1.0f;
     m_pContext->RSSetViewports(1, &viewport);
 
-    // Рисуем геометрию
+    //                 
     m_pContext->DrawIndexed(36, 0, 0);
 
-    // Отвязываем HDR-текстуру от цели рендеринга
+    //            HDR-                           
     ID3D11RenderTargetView* nullRTV = nullptr;
     m_pContext->OMSetRenderTargets(1, &nullRTV, nullptr);
 
-    // Применяем Tone Mapping
+    //           Tone Mapping
     renderTargets[0] = m_pBackBufferRTV;
     m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);
     m_hdr.Render(m_pContext, m_hdr.GetHDRTexture());
 
-    // Презентация
+    //            
     hr = m_pSwapChain->Present(0, 0);
     if (FAILED(hr)) {
         return false;
@@ -297,9 +304,9 @@ HRESULT Renderer::InitScene() {
         7,4,6,
     };
     static const D3D11_INPUT_ELEMENT_DESC InputDesc[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"COLOR", 0,  DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0} // Исправлено
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0},
+    {"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}, // 16     
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0}        // 8     
     };
 
 
@@ -463,19 +470,19 @@ bool Renderer::Frame() {
         sceneBuffer.mViewProjectionMatrix = XMMatrixMultiply(mView, mProjection);
         m_pContext->Unmap(m_pSceneMatrixBuffer, 0);
     }
-
+    m_lightManager.Update(m_pContext);
     return SUCCEEDED(hr);
 }
 
 void Renderer::HandleKeyPress(char key) {
     if (key == '1') {
-        m_lightManager.ToggleLightIntensity(0); // Переключение яркости первого источника света
+        m_lightManager.ToggleLightIntensity(0); //                                             
     }
     else if (key == '2') {
-        m_lightManager.ToggleLightIntensity(1); // Переключение яркости второго источника света
+        m_lightManager.ToggleLightIntensity(1); //                                             
     }
     else if (key == '3') {
-        m_lightManager.ToggleLightIntensity(2); // Переключение яркости третьего источника света
+        m_lightManager.ToggleLightIntensity(2); //                                              
     }
 }
 

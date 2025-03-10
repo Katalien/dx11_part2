@@ -14,3 +14,8 @@ C:\Users\KNS\Desktop\1\lab2\x64\Release\ToneMapping.cso
 C:\Users\KNS\Desktop\1\lab2\x64\Release\vertexShader.cso
 C:\Users\KNS\Desktop\1\lab2\x64\Release\pixelShader.hlsl
 C:\Users\KNS\Desktop\1\lab2\x64\Release\lab1_dx11.exe
+D:\STUDY\Comp_Graph\DirectX\lab2\x64\Release\defaultVertexShader.cso
+D:\STUDY\Comp_Graph\DirectX\lab2\x64\Release\ToneMapping.cso
+D:\STUDY\Comp_Graph\DirectX\lab2\x64\Release\vertexShader.cso
+D:\STUDY\Comp_Graph\DirectX\lab2\x64\Release\pixelShader.hlsl
+D:\STUDY\Comp_Graph\DirectX\lab2\x64\Release\lab1_dx11.exe
