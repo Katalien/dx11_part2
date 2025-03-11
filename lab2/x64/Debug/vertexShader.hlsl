@@ -28,8 +28,12 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
     // Умножаем позицию сначала на мировую матрицу, затем на view-projection
-    float4 worldPos = mul(input.position, mWorldMatrix);
-    output.sv_position = mul(worldPos, mViewProjectionMatrix);
+    //float4 worldPos = mul(input.position, mWorldMatrix);
+    //output.sv_position = mul(worldPos, mViewProjectionMatrix);
+    
+    float4 worldPos = mul(mWorldMatrix, input.position);
+    output.sv_position = mul(mViewProjectionMatrix, worldPos);
+    
     output.world_position = worldPos.xyz;
     output.color = input.color;
     output.uv = input.uv;

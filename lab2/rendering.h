@@ -21,6 +21,11 @@ struct SceneMatrixBuffer {
     XMMATRIX mViewProjectionMatrix;
 };
 
+//struct SceneConstants {
+//    XMFLOAT4 avgLuminance;
+//    XMFLOAT3 padding;
+//};
+
 //struct TransformBuffer {
 //    XMMATRIX worldMatrix;         // 64 bytes
 //    XMMATRIX viewProjectionMatrix; // 64 bytes

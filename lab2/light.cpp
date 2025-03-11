@@ -9,9 +9,9 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
     m_lights[2] = { {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}, 1.0f, {} };*/
 
     float offset = 10.0f; // Расстояние между источниками
-    m_lights[0] = { {-offset, 0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 5.0f, {} }; // Красный слева
-    m_lights[1] = { {0.0f, 0.0f, 0.0f, 1.0f},  {1.0f, 0.0f, 0.0f, 1.0f}, 5.0f, {} };       // Зеленый в центре
-    m_lights[2] = { {offset, 0.0f, 0.0f, 1.0f},  {1.0f, 0.0f, 0.0f, 1.0f}, 5.0f, {} };  // Синий справа
+    m_lights[0] = { {-offset, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, 5.0f, {} }; // Красный слева
+    m_lights[1] = { {0.0f, 0.0f, 0.0f, 1.0f},  {0.0f, 1.0f, 0.0f, 1.0f}, 5.0f, {} };       // Зеленый в центре
+    m_lights[2] = { {offset, 0.0f, 0.0f, 1.0f},  {0.0f, 1.0f, 0.0f, 1.0f}, 5.0f, {} };  // Синий справа
 
     m_intensityLevels[0] = 1.0f;
     m_intensityLevels[1] = 1.0f;
@@ -26,7 +26,7 @@ void LightManager::Init(ID3D11Device* device) {
     if (!device) return;
 
     D3D11_BUFFER_DESC desc = {};
-    desc.ByteWidth = sizeof(PointLight) * 3;  // 48 * 3 = 144 (кратно 16)
+    desc.ByteWidth = sizeof(PointLight) * 3;  // 48 * 3 = 144 
     desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -44,7 +44,7 @@ void LightManager::Update(ID3D11DeviceContext* context) {
     context->Unmap(m_pLightBuffer, 0);
 
 #ifdef _DEBUG
-    // Пример: вывод позиции первого источника света
+
     OutputDebugStringA(("Light 0 Position: (" +
         std::to_string(m_lights[0].Position.x) + ", " +
         std::to_string(m_lights[0].Position.y) + ", " +

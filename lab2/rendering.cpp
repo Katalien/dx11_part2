@@ -168,7 +168,7 @@ bool Renderer::Resize(UINT width, UINT height) {
 
 bool Renderer::Render() {
     //                       
-    static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0, 1.0f };
     m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
 
     //                                             

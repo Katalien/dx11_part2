@@ -3,6 +3,10 @@ struct PointLight
     float4 Position; // В мировых координатах
     float4 Color;
     float Intensity;
+    
+    //доавбляем выравнивание
+    float3 Padding;
+    
 };
 
 cbuffer LightBuffer : register(b2)
@@ -21,10 +25,12 @@ struct PS_INPUT
 
 float4 CalculateLighting(PS_INPUT input, PointLight light)
 {
-    // Используем мировые координаты вершины и света
     float3 lightDir = normalize(light.Position.xyz - input.world_position);
     float distance = length(light.Position.xyz - input.world_position);
-    float attenuation = 1.0 / (distance * distance);
+    
+    // Уменьшенное затухание для большей зоны влияния
+    float attenuation = 1.0 / (distance * 0.5 + 1.0);
+    
     float3 lightColor = light.Color.rgb * light.Intensity * attenuation;
     return float4(lightColor * input.color.rgb, input.color.a);
 }
