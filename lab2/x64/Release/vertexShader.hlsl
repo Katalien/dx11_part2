@@ -27,7 +27,7 @@ struct VS_OUTPUT
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
-    // Умножаем позицию сначала на мировую матрицу, затем на view-projection
+    
     //float4 worldPos = mul(input.position, mWorldMatrix);
     //output.sv_position = mul(worldPos, mViewProjectionMatrix);
     

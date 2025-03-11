@@ -28,7 +28,7 @@ float4 CalculateLighting(PS_INPUT input, PointLight light)
     float3 lightDir = normalize(light.Position.xyz - input.world_position);
     float distance = length(light.Position.xyz - input.world_position);
     
-    // ”меньшенное затухание дл€ большей зоны вли€ни€
+    
     float attenuation = 1.0 / (distance * 0.5 + 1.0);
     
     float3 lightColor = light.Color.rgb * light.Intensity * attenuation;

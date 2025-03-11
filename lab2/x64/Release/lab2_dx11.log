@@ -1,4 +1,5 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: промежуточный каталог (x64\Release\) содержит файлы, которые используются совместно с другим проектом (lab2_dx11.vcxproj).  Это может привести к ошибкам очистки и перестроения.
+  compilation object save succeeded; see D:\STUDY\Comp_Graph\DirectX\lab2\x64\Release\vertexShader.cso
   light.cpp
   Создание кода
   4 of 270 functions ( 1.5%) were compiled, the rest were copied from previous compilation.
