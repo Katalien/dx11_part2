@@ -83,12 +83,11 @@
     <FxCompile Include="vertexShader.hlsl">
       <Filter>Исходные файлы</Filter>
     </FxCompile>
-    <FxCompile Include="ToneMapping.hlsl">
-      <Filter>Исходные файлы</Filter>
-    </FxCompile>
     <FxCompile Include="defaultVertexShader.hlsl">
       <Filter>Исходные файлы</Filter>
     </FxCompile>
+    <FxCompile Include="ToneMappingVS.hlsl" />
+    <FxCompile Include="ToneMappingPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pixelShader.hlsl">

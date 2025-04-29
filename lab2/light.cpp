@@ -10,8 +10,8 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
 
     float offset = 10.0f; // Расстояние между источниками
     m_lights[0] = { {-offset, 0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 5.0f, {} }; // Красный слева
-    m_lights[1] = { {0.0f, 0.0f, 0.0f, 1.0f},  {1.0f, 0.0f, 0.0f, 1.0f}, 5.0f, {} };       // Зеленый в центре
-    m_lights[2] = { {offset, 0.0f, 0.0f, 1.0f},  {1.0f, 0.0f, 0.0f, 1.0f}, 5.0f, {} };  // Синий справа
+    m_lights[1] = { {0.0f, 0.0f, 0.0f, 1.0f},  {0.0f, 1.0f, 0.0f, 1.0f}, 5.0f, {} };       // Зеленый в центре
+    m_lights[2] = { {offset, 0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f, 1.0f}, 5.0f, {} };  // Синий справа
 
     m_intensityLevels[0] = 1.0f;
     m_intensityLevels[1] = 1.0f;

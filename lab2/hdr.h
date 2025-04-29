@@ -19,6 +19,9 @@ private:
     ID3D11ShaderResourceView* m_pHDRSRV;
     ID3D11PixelShader* m_pToneMappingPS;
     ID3D11VertexShader* m_pToneMappingVS;
+    ID3D11Buffer* m_pQuadVB = nullptr;        // Вершинный буфер квада
+    ID3D11InputLayout* m_pInputLayout = nullptr; // Лэйаут ввода
+    ID3D11SamplerState* m_pSampler = nullptr; // Сэмплер
 
 };
 

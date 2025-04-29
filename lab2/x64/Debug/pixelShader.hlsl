@@ -3,6 +3,10 @@ struct PointLight
     float4 Position; // В мировых координатах
     float4 Color;
     float Intensity;
+    
+    //доавбляем выравнивание
+    float3 Padding;
+    
 };
 
 cbuffer LightBuffer : register(b2)

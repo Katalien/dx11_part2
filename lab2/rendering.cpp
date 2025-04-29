@@ -167,94 +167,61 @@ bool Renderer::Resize(UINT width, UINT height) {
 }
 
 bool Renderer::Render() {
-    //                       
+    // Очистка HDR-цели рендеринга
     static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
+    ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
+    m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
 
-    //                                             
-    ID3D11ShaderResourceView* nullSRV = nullptr;
-    m_pContext->PSSetShaderResources(0, 1, &nullSRV);
-
-    //               HDR-                            
-    /*ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
+    // Устанавливаем HDR-текстуру как цель рендеринга
     ID3D11RenderTargetView* renderTargets[] = { hdrRTV };
-    m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);*/
-
-    ID3D11RenderTargetView* renderTargets[] = { m_pBackBufferRTV };
     m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);
 
-    //         HDR-        
-    m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
-    //m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
+    // Очистка глубины (если используется)
+    // m_pContext->ClearDepthStencilView(...);
 
-    //                              
-    ComPtr<ID3D11SamplerState> pSamplerState;
-    D3D11_SAMPLER_DESC samplerDesc = {};
-    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    samplerDesc.MinLOD = 0;
-    samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-    HRESULT hr = m_pDevice->CreateSamplerState(&samplerDesc, &pSamplerState);
-    if (FAILED(hr)) {
-        return false;
-    }
-    m_pContext->PSSetSamplers(0, 1, pSamplerState.GetAddressOf());
-
-    //                                           
-    m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-    ID3D11Buffer* vertexBuffers[] = { m_pVertexBuffer };
-    UINT strides[] = { sizeof(Vertex) };
-    UINT offsets[] = { 0 };
-    m_pContext->IASetVertexBuffers(0, 1, vertexBuffers, strides, offsets);
-
-    //                                        
-    m_pContext->IASetInputLayout(m_pInputLayout);
-    m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    //                      
-    m_pContext->VSSetShader(m_pVertexShader, nullptr, 0);
-    m_pContext->PSSetShader(m_pPixelShader, nullptr, 0);
-
-    //                                 
-    ID3D11Buffer* constantBuffers[] = { m_pSceneMatrixBuffer, m_pWorldMatrixBuffer };
-    m_pContext->VSSetConstantBuffers(0, 2, constantBuffers);
-
-    ID3D11Buffer* lightBuffer = m_lightManager.GetLightBuffer();
-    m_pContext->PSSetConstantBuffers(2, 1, &lightBuffer); //         b2
-
-    //                      
+    // Настройка вьюпорта
     D3D11_VIEWPORT viewport = {};
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
     viewport.Width = static_cast<float>(m_width);
     viewport.Height = static_cast<float>(m_height);
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
     m_pContext->RSSetViewports(1, &viewport);
 
-    //                 
+    // Рендеринг сцены
+    m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    ID3D11Buffer* vertexBuffers[] = { m_pVertexBuffer };
+    UINT strides[] = { sizeof(Vertex) };
+    UINT offsets[] = { 0 };
+    m_pContext->IASetVertexBuffers(0, 1, vertexBuffers, strides, offsets);
+
+    m_pContext->IASetInputLayout(m_pInputLayout);
+    m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    m_pContext->VSSetShader(m_pVertexShader, nullptr, 0);
+    m_pContext->PSSetShader(m_pPixelShader, nullptr, 0);
+
+    ID3D11Buffer* constantBuffers[] = { m_pSceneMatrixBuffer, m_pWorldMatrixBuffer };
+    m_pContext->VSSetConstantBuffers(0, 2, constantBuffers);
+
+    ID3D11Buffer* lightBuffer = m_lightManager.GetLightBuffer();
+    m_pContext->PSSetConstantBuffers(2, 1, &lightBuffer);
+
     m_pContext->DrawIndexed(36, 0, 0);
 
-    //            HDR-                           
-    ID3D11RenderTargetView* nullRTV = nullptr;
-    m_pContext->OMSetRenderTargets(1, &nullRTV, nullptr);
+    // Отвязываем HDR-цель
+    ID3D11RenderTargetView* nullRTVs[] = { nullptr };
+    m_pContext->OMSetRenderTargets(1, nullRTVs, nullptr);
 
-    //           Tone Mapping
-    renderTargets[0] = m_pBackBufferRTV;
-    m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);
+    // Тональная коррекция
+    ID3D11RenderTargetView* backBufferRTVs[] = { m_pBackBufferRTV };
+    m_pContext->OMSetRenderTargets(1, backBufferRTVs, nullptr);
+    m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
+
     m_hdr.Render(m_pContext, m_hdr.GetHDRTexture());
 
-    //            
-    hr = m_pSwapChain->Present(0, 0);
-    if (FAILED(hr)) {
-        return false;
-    }
-
-    return true;
+    // Презентация
+    HRESULT hr = m_pSwapChain->Present(0, 0);
+    return SUCCEEDED(hr);
 }
 
 HRESULT Renderer::SetupBackBuffer() {

@@ -2,6 +2,10 @@
 #include <assert.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include <dxgi.h>
+#include <directxmath.h>
+#define SAFE_RELEASE(a) if (a != NULL) { a->Release(); a = NULL; }
+using namespace DirectX;
 
 HDR::HDR() : m_pHDRTexture(nullptr), m_pHDRRTV(nullptr), m_pHDRSRV(nullptr), m_pToneMappingPS(nullptr) {}
 
@@ -13,52 +17,109 @@ HDR::~HDR() {
     if (m_pToneMappingVS) m_pToneMappingVS->Release();
 }
 
-bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
-    // Создание HDR-текстуры
-    D3D11_TEXTURE2D_DESC desc = {};
-    desc.Width = width;
-    desc.Height = height;
-    desc.MipLevels = 1;
-    desc.ArraySize = 1;
-    desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-    desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+struct SimpleVertex {
+    XMFLOAT3 Pos;
+    XMFLOAT2 Tex;
+};
 
-    HRESULT hr = device->CreateTexture2D(&desc, nullptr, &m_pHDRTexture);
+bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
+    HRESULT hr;
+
+    // 1. Создание HDR-текстуры
+    D3D11_TEXTURE2D_DESC textureDesc = {};
+    textureDesc.Width = width;
+    textureDesc.Height = height;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+    hr = device->CreateTexture2D(&textureDesc, nullptr, &m_pHDRTexture);
     if (FAILED(hr)) return false;
 
+    // 2. Создание Render Target View
     hr = device->CreateRenderTargetView(m_pHDRTexture, nullptr, &m_pHDRRTV);
     if (FAILED(hr)) return false;
 
+    // 3. Создание Shader Resource View
     hr = device->CreateShaderResourceView(m_pHDRTexture, nullptr, &m_pHDRSRV);
     if (FAILED(hr)) return false;
 
-    // Загрузка шейдера Tone Mapping
-    ID3D10Blob* pShaderBlob = nullptr;
-    hr = D3DCompileFromFile(L"ToneMapping.hlsl", nullptr, nullptr, "main", "ps_5_0", 0, 0, &pShaderBlob, nullptr);
+    // 4. Создание вершинного буфера для квада
+    SimpleVertex vertices[] = {
+        { XMFLOAT3(-1.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },
+        { XMFLOAT3(1.0f, 1.0f, 0.0f),   XMFLOAT2(1.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
+        { XMFLOAT3(1.0f, -1.0f, 0.0f),  XMFLOAT2(1.0f, 1.0f) }
+    };
+
+    D3D11_BUFFER_DESC vbDesc = {};
+    vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    vbDesc.ByteWidth = sizeof(vertices);
+    vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vbDesc.CPUAccessFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = vertices;
+
+    hr = device->CreateBuffer(&vbDesc, &initData, &m_pQuadVB);
     if (FAILED(hr)) return false;
 
-    hr = device->CreatePixelShader(pShaderBlob->GetBufferPointer(), pShaderBlob->GetBufferSize(), nullptr, &m_pToneMappingPS);
-    pShaderBlob->Release();
-    if (FAILED(hr)) return false;
+    // 5. Компиляция шейдеров
+    ID3DBlob* vsBlob = nullptr;
+    hr = D3DCompileFromFile(L"ToneMappingVS.hlsl", nullptr, nullptr, "main", "vs_5_0", 0, 0, &vsBlob, nullptr);
+    if (SUCCEEDED(hr)) {
+        hr = device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_pToneMappingVS);
+    }
 
-    ID3D10Blob* vShaderBlob = nullptr;
-    hr = D3DCompileFromFile(L"defaultVertexShader.hlsl", nullptr, nullptr, "main", "vs_5_0", 0, 0, &vShaderBlob, nullptr);
-    if (FAILED(hr)) return false;
+    ID3DBlob* psBlob = nullptr;
+    hr = D3DCompileFromFile(L"ToneMappingPS.hlsl", nullptr, nullptr, "main", "ps_5_0", 0, 0, &psBlob, nullptr);
+    if (SUCCEEDED(hr)) {
+        hr = device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pToneMappingPS);
+    }
 
-    hr = device->CreateVertexShader(vShaderBlob->GetBufferPointer(), vShaderBlob->GetBufferSize(), nullptr, &m_pToneMappingVS);
-    vShaderBlob->Release();
-    if (FAILED(hr)) return false;
+    // 6. Создание входного лэйаута
+    D3D11_INPUT_ELEMENT_DESC layout[] = {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+    };
 
-    return true;
+    hr = device->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &m_pInputLayout);
+
+    SAFE_RELEASE(vsBlob);
+    SAFE_RELEASE(psBlob);
+    
+    // 7. Создание сэмплера
+    D3D11_SAMPLER_DESC sampDesc = {};
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+
+    hr = device->CreateSamplerState(&sampDesc, &m_pSampler);
+
+    return SUCCEEDED(hr);
 }
 
 void HDR::Render(ID3D11DeviceContext* context, ID3D11ShaderResourceView* sourceTexture) {
-    // Применение Tone Mapping
+    context->VSSetShader(m_pToneMappingVS, nullptr, 0);
     context->PSSetShader(m_pToneMappingPS, nullptr, 0);
+
+    UINT stride = sizeof(SimpleVertex);
+    UINT offset = 0;
+    context->IASetVertexBuffers(0, 1, &m_pQuadVB, &stride, &offset);
+    context->IASetInputLayout(m_pInputLayout);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
     context->PSSetShaderResources(0, 1, &sourceTexture);
+    context->PSSetSamplers(0, 1, &m_pSampler);
+
     context->Draw(4, 0);
+
+    ID3D11ShaderResourceView* nullSRV = nullptr;
+    context->PSSetShaderResources(0, 1, &nullSRV);
 }
 
 ID3D11ShaderResourceView* HDR::GetHDRTexture() const {
