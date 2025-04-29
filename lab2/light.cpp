@@ -3,15 +3,32 @@
 #include <string>
 
 LightManager::LightManager() : m_pLightBuffer(nullptr) {
-    // Инициализация источников света с Padding
+
     /*m_lights[0] = { {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
     m_lights[1] = { {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, 1.0f, {} };
     m_lights[2] = { {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}, 1.0f, {} };*/
 
-    float offset = 10.0f; // Расстояние между источниками
-    m_lights[0] = { {-offset, 0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 5.0f, {} }; // Красный слева
-    m_lights[1] = { {0.0f, 0.0f, 0.0f, 1.0f},  {0.0f, 1.0f, 0.0f, 1.0f}, 5.0f, {} };       // Зеленый в центре
-    m_lights[2] = { {offset, 0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f, 1.0f}, 5.0f, {} };  // Синий справа
+    float offset = 10.0f; 
+    m_lights[0] = {
+    {-3.0f, 0.0f, 0.0f, 1.0f}, 
+    {15.0f, 0.0f, 0.0f, 1.0f},  
+    0.5f,                     
+    {}
+    };
+
+    m_lights[1] = {
+        {3.0f, 0.0f, 0.0f, 1.0f},   
+        {0.0f, 15.0f, 0.0f, 1.0f},  
+        1.0f,
+        {}
+    };
+
+    m_lights[2] = {
+        {0.0f, 3.0f, 0.0f, 1.0f}, 
+        {0.0f, 0.0f, 15.0f, 1.0f},  
+        2.0f,
+        {}
+    };
 
     m_intensityLevels[0] = 1.0f;
     m_intensityLevels[1] = 1.0f;
@@ -26,7 +43,7 @@ void LightManager::Init(ID3D11Device* device) {
     if (!device) return;
 
     D3D11_BUFFER_DESC desc = {};
-    desc.ByteWidth = sizeof(PointLight) * 3;  // 48 * 3 = 144 (кратно 16)
+    desc.ByteWidth = sizeof(PointLight) * 3;
     desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -63,7 +80,7 @@ void LightManager::SetLightIntensity(int index, float intensity) {
 
 void LightManager::ToggleLightIntensity(int index) {
     if (index >= 0 && index < 3) {
-        // Переключение между уровнями яркости: 1, 10, 100
+
         if (m_intensityLevels[index] == 1.0f) {
             m_intensityLevels[index] = 10.0f;
         }
@@ -74,7 +91,7 @@ void LightManager::ToggleLightIntensity(int index) {
             m_intensityLevels[index] = 1.0f;
         }
 
-        // Применение новой яркости к источнику света
+
         m_lights[index].Intensity = m_intensityLevels[index];
     }
 }

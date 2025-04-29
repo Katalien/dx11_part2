@@ -25,7 +25,7 @@ struct SimpleVertex {
 bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     HRESULT hr;
 
-    // 1. Создание HDR-текстуры
+
     D3D11_TEXTURE2D_DESC textureDesc = {};
     textureDesc.Width = width;
     textureDesc.Height = height;
@@ -39,15 +39,15 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     hr = device->CreateTexture2D(&textureDesc, nullptr, &m_pHDRTexture);
     if (FAILED(hr)) return false;
 
-    // 2. Создание Render Target View
+
     hr = device->CreateRenderTargetView(m_pHDRTexture, nullptr, &m_pHDRRTV);
     if (FAILED(hr)) return false;
 
-    // 3. Создание Shader Resource View
+    
     hr = device->CreateShaderResourceView(m_pHDRTexture, nullptr, &m_pHDRSRV);
     if (FAILED(hr)) return false;
 
-    // 4. Создание вершинного буфера для квада
+    
     SimpleVertex vertices[] = {
         { XMFLOAT3(-1.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },
         { XMFLOAT3(1.0f, 1.0f, 0.0f),   XMFLOAT2(1.0f, 0.0f) },
@@ -67,7 +67,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     hr = device->CreateBuffer(&vbDesc, &initData, &m_pQuadVB);
     if (FAILED(hr)) return false;
 
-    // 5. Компиляция шейдеров
+  
     ID3DBlob* vsBlob = nullptr;
     hr = D3DCompileFromFile(L"ToneMappingVS.hlsl", nullptr, nullptr, "main", "vs_5_0", 0, 0, &vsBlob, nullptr);
     if (SUCCEEDED(hr)) {
@@ -80,7 +80,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
         hr = device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pToneMappingPS);
     }
 
-    // 6. Создание входного лэйаута
+
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
@@ -91,7 +91,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     SAFE_RELEASE(vsBlob);
     SAFE_RELEASE(psBlob);
     
-    // 7. Создание сэмплера
+
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -127,5 +127,5 @@ ID3D11ShaderResourceView* HDR::GetHDRTexture() const {
 }
 
 ID3D11RenderTargetView* HDR::GetHDRRTV() const {
-    return m_pHDRRTV; // Возвращаем RTV для HDR-текстуры
+    return m_pHDRRTV;
 }

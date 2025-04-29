@@ -57,7 +57,7 @@ bool Renderer::Init(HINSTANCE hInstance, HWND hWnd) {
         swapChainDesc.BufferCount = 2;
         swapChainDesc.BufferDesc.Width = m_width;
         swapChainDesc.BufferDesc.Height = m_height;
-        swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
         swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
         swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -167,17 +167,16 @@ bool Renderer::Resize(UINT width, UINT height) {
 }
 
 bool Renderer::Render() {
-    // Очистка HDR-цели рендеринга
+
     static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
     m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
 
-    // Устанавливаем HDR-текстуру как цель рендеринга
+ 
     ID3D11RenderTargetView* renderTargets[] = { hdrRTV };
     m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);
 
-    // Очистка глубины (если используется)
-    // m_pContext->ClearDepthStencilView(...);
+
 
     // Настройка вьюпорта
     D3D11_VIEWPORT viewport = {};
