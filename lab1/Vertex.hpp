@@ -7,6 +7,6 @@
 using namespace DirectX;
 
 struct Vertex {
-    float x, y, z;
-    COLORREF color;
+    XMFLOAT3 position; // Позиция (x, y, z)
+    XMFLOAT4 color;    // Цвет (r, g, b, a)
 };
