@@ -25,7 +25,7 @@ struct PS_INPUT
 
 float4 CalculateLighting(PS_INPUT input, PointLight light)
 {
-    // »спользуем мировые координаты вершины и света
+
     float3 lightDir = normalize(light.Position.xyz - input.world_position);
     float distance = length(light.Position.xyz - input.world_position);
     float attenuation = 1.0 / (distance * distance);
