@@ -15,7 +15,7 @@ struct PS_INPUT
     float2 Tex : TEXCOORD0;
 };
 
-// Функция тонального отображения Uncharted 2
+
 float3 Uncharted2Tonemap(float3 x)
 {
     return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
@@ -35,8 +35,8 @@ float4 main(PS_INPUT input) : SV_Target
 {
     float3 hdrColor = HDRTexture.Sample(Sampler, input.Tex).rgb;
 
-    // Получите среднюю яркость из вычислений (например, через отдельный буфер)
-    float avgLuminance = 1.0; // Замените на реальное значение
+
+    float avgLuminance = 1.0; // what avg can i do.... new shader ???
     float E = getExposition(avgLuminance);
     
     float3 curr = Uncharted2Tonemap(hdrColor * E);
