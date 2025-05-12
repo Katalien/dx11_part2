@@ -165,19 +165,12 @@ bool Renderer::Resize(UINT width, UINT height) {
     }
     return true;
 }
-
 bool Renderer::Render() {
-    // Очистка HDR-цели рендеринга
+    // Очистка HDR цели рендеринга
     static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
+    m_pContext->OMSetRenderTargets(1, &hdrRTV, nullptr);
     m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
-
-    // Устанавливаем HDR-текстуру как цель рендеринга
-    ID3D11RenderTargetView* renderTargets[] = { hdrRTV };
-    m_pContext->OMSetRenderTargets(1, renderTargets, nullptr);
-
-    // Очистка глубины (если используется)
-    // m_pContext->ClearDepthStencilView(...);
 
     // Настройка вьюпорта
     D3D11_VIEWPORT viewport = {};
@@ -187,8 +180,23 @@ bool Renderer::Render() {
     viewport.MaxDepth = 1.0f;
     m_pContext->RSSetViewports(1, &viewport);
 
-    // Рендеринг сцены
+    // Рендеринг 3D-сцены в HDR текстуру
+    m_pContext->OMSetRenderTargets(1, &hdrRTV, nullptr);
+    RenderScene();
+
+    // Тональная коррекция и вывод на экран
+    ID3D11RenderTargetView* backBufferRTV = m_pBackBufferRTV;
+    m_hdr.Render(m_pContext, m_hdr.GetHDRTexture(), backBufferRTV);
+
+    // Презентация
+    HRESULT hr = m_pSwapChain->Present(0, 0);
+    return SUCCEEDED(hr);
+}
+
+// Вспомогательная функция для рендеринга объекта
+void Renderer::RenderScene() {
     m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
     ID3D11Buffer* vertexBuffers[] = { m_pVertexBuffer };
     UINT strides[] = { sizeof(Vertex) };
     UINT offsets[] = { 0 };
@@ -207,21 +215,6 @@ bool Renderer::Render() {
     m_pContext->PSSetConstantBuffers(2, 1, &lightBuffer);
 
     m_pContext->DrawIndexed(36, 0, 0);
-
-    // Отвязываем HDR-цель
-    ID3D11RenderTargetView* nullRTVs[] = { nullptr };
-    m_pContext->OMSetRenderTargets(1, nullRTVs, nullptr);
-
-    // Тональная коррекция
-    ID3D11RenderTargetView* backBufferRTVs[] = { m_pBackBufferRTV };
-    m_pContext->OMSetRenderTargets(1, backBufferRTVs, nullptr);
-    m_pContext->ClearRenderTargetView(m_pBackBufferRTV, clearColor);
-
-    m_hdr.Render(m_pContext, m_hdr.GetHDRTexture());
-
-    // Презентация
-    HRESULT hr = m_pSwapChain->Present(0, 0);
-    return SUCCEEDED(hr);
 }
 
 HRESULT Renderer::SetupBackBuffer() {

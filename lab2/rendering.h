@@ -87,4 +87,6 @@ private:
 
     LightManager m_lightManager;
     HDR m_hdr;
+
+    void RenderScene();
 };

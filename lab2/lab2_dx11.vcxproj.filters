@@ -45,6 +45,9 @@
     <ClInclude Include="hdr.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="BrightnessCalculator.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lab2_dx11.cpp">
@@ -63,6 +66,9 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="hdr.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="BrightnessCalculator.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -88,6 +94,8 @@
     </FxCompile>
     <FxCompile Include="ToneMappingVS.hlsl" />
     <FxCompile Include="ToneMappingPS.hlsl" />
+    <FxCompile Include="FullscreenVS.hlsl" />
+    <FxCompile Include="DownsamplePS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pixelShader.hlsl">

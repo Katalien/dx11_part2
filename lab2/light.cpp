@@ -11,23 +11,23 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
     float offset = 10.0f; // Расстояние между источниками
 
     m_lights[0] = {
-    {-3.0f, 0.0f, 0.0f, 1.0f},
+    {-10.0f, 0.0f, 0.0f, 1.0f},
     {1.0f, 0.0f, 0.0f, 1.0f},  // Красный цвет
-    50.0f,
+    10.0f,
     {}
     };
 
     m_lights[1] = {
-        {3.0f, 0.0f, 0.0f, 1.0f},
-        {0.0f, 1.0f, 0.0f, 1.0f},  // Зеленый цвет
-        30.0f,
+    {0.0f, 0.0f, 0.0f, 1.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},  // Зеленый цвет
+        1.0f,
         {}
     };
 
     m_lights[2] = {
-        {0.0f, 3.0f, 0.0f, 1.0f},
-        {0.0f, 0.0f, 1.0f, 1.0f},  // Синий цвет
-        20.0f,
+    {0.0f, 3.0f, 0.0f, 1.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},  // Синий цвет
+        1.0f,
         {}
     };
 
@@ -81,18 +81,8 @@ void LightManager::SetLightIntensity(int index, float intensity) {
 
 void LightManager::ToggleLightIntensity(int index) {
     if (index >= 0 && index < 3) {
-        // Переключение между уровнями яркости: 1, 10, 100
-        if (m_intensityLevels[index] == 1.0f) {
-            m_intensityLevels[index] = 10.0f;
-        }
-        else if (m_intensityLevels[index] == 10.0f) {
-            m_intensityLevels[index] = 100.0f;
-        }
-        else {
-            m_intensityLevels[index] = 1.0f;
-        }
-
-        // Применение новой яркости к источнику света
+        m_intensityLevels[index] = fmodf(m_intensityLevels[index] * 10.0f, 1000.0f);
+        if (m_intensityLevels[index] < 1.0f) m_intensityLevels[index] = 1.0f;
         m_lights[index].Intensity = m_intensityLevels[index];
     }
 }

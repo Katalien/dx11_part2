@@ -1,13 +1,22 @@
+
+
 Texture2D HDRTexture : register(t0);
+Texture2D AvgLuminance : register(t1);
 SamplerState Sampler : register(s0);
 
-static const float A = 0.15f;
-static const float B = 0.50f;
-static const float C = 0.10f;
-static const float D = 0.20f;
-static const float E = 0.02f;
-static const float F = 0.30f;
-static const float W = 11.2f;
+cbuffer AdaptationBuffer : register(b0)
+{
+    float DeltaTime;
+    float AdaptationSpeed;
+};
+
+static const float A = 0.15;
+static const float B = 0.50;
+static const float C = 0.10;
+static const float D = 0.20;
+static const float E = 0.02;
+static const float F = 0.30;
+static const float W = 11.2;
 
 struct PS_INPUT
 {
@@ -15,34 +24,34 @@ struct PS_INPUT
     float2 Tex : TEXCOORD0;
 };
 
-
 float3 Uncharted2Tonemap(float3 x)
 {
     return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
 }
 
-static const float WhiteLumen = 11.2f;
-static const float lumMin = 0.1;
-static const float lumMax = 100.0;
-
-float getExposition(float avgLuminance)
-{
-    float keyValue = 1.03 - 2.0 / (2.0 + log2(avgLuminance + 1));
-    return keyValue / clamp(avgLuminance, lumMin, lumMax);
-}
-
 float4 main(PS_INPUT input) : SV_Target
 {
+    // Чтение HDR цвета
     float3 hdrColor = HDRTexture.Sample(Sampler, input.Tex).rgb;
-
-
-    float avgLuminance = 1.0; // what avg can i do.... new shader ???
-    float E = getExposition(avgLuminance);
     
-    float3 curr = Uncharted2Tonemap(hdrColor * E);
-    float3 whiteScale = 1.0f / Uncharted2Tonemap(WhiteLumen);
+    // Получение средней яркости
+    float avgLum = AvgLuminance.Sample(Sampler, float2(0.5, 0.5)).r;
+    
+    // Адаптация яркости
+    static float adaptedLum = 1.0;
+    adaptedLum = lerp(adaptedLum, avgLum, DeltaTime * AdaptationSpeed);
+    
+    // Вычисление экспозиции
+    float exposure = 1.0 / (adaptedLum + 0.0001);
+    float3 exposedColor = hdrColor * exposure;
+    
+    // Применение тонального отображения
+    float3 curr = Uncharted2Tonemap(exposedColor);
+    float3 whiteScale = 1.0 / Uncharted2Tonemap(W);
     float3 result = curr * whiteScale;
-
-    result = pow(result, 1.0f / 2.2f);
-    return float4(result, 1.0f);
+    
+    // Гамма-коррекция
+    result = pow(result, 1.0 / 2.2);
+    
+    return float4(result, 1.0);
 }

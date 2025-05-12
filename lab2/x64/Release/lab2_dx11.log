@@ -1,11 +1,4 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: промежуточный каталог (x64\Release\) содержит файлы, которые используются совместно с другим проектом (lab2_dx11.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  light.cpp
-  rendering.cpp
-  Создание кода
-  4 of 270 functions ( 1.5%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
-  Создание кода завершено
-  lab2_dx11.vcxproj -> D:\STUDY\Comp_Graph\DirectX\lab2\x64\Release\lab1_dx11.exe
-  Скопировано файлов:         1.
-  Скопировано файлов:         1.
+C:\Users\kns_user\Desktop\aaaa\dx11_part2\lab2\DownsamplePS.hlsl(4,72-82): error X4502: invalid vs_2_0 output semantic 'SV_TARGET'
+  
+  compilation failed; no code produced

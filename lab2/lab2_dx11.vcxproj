@@ -180,6 +180,7 @@ copy "$(ProjectDir)pixelShader.hlsl" "$(OutDir)pixelShader.hlsl"</Command>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BrightnessCalculator.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="hdr.h" />
@@ -192,6 +193,7 @@ copy "$(ProjectDir)pixelShader.hlsl" "$(OutDir)pixelShader.hlsl"</Command>
     <ClInclude Include="Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BrightnessCalculator.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="hdr.cpp" />
     <ClCompile Include="input.cpp" />
@@ -219,6 +221,14 @@ copy "$(ProjectDir)pixelShader.hlsl" "$(OutDir)pixelShader.hlsl"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </None>
     <FxCompile Include="defaultVertexShader.hlsl" />
+    <FxCompile Include="DownsamplePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="FullscreenVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="ToneMappingPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
