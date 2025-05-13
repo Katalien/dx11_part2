@@ -39,7 +39,10 @@ float4 main(PS_INPUT input) : SV_Target
     
     // јдаптаци€ €ркости
     static float adaptedLum = 1.0;
-    adaptedLum = lerp(adaptedLum, avgLum, DeltaTime * AdaptationSpeed);
+    
+    float adaptationFactor = 1.0 - exp(-DeltaTime * AdaptationSpeed);
+    adaptedLum = lerp(adaptedLum, avgLum, adaptationFactor);
+    //adaptedLum = lerp(adaptedLum, avgLum, DeltaTime * AdaptationSpeed);
     
     // calc exp
     float exposure = 1.0 / (adaptedLum + 0.0001);
