@@ -28,8 +28,11 @@ float4 CalculateLighting(PS_INPUT input, PointLight light)
 
     float3 lightDir = normalize(light.Position.xyz - input.world_position);
     float distance = length(light.Position.xyz - input.world_position);
-    float attenuation = 1.0 / (distance * distance);
-    float3 lightColor = light.Color.rgb * light.Intensity * attenuation;
+    //float attenuation = 1.0 / (distance * distance);
+    //float3 lightColor = light.Color.rgb * light.Intensity * attenuation;
+    float attenuation = 1.0 / (1.0 + 10.0 * distance + 50.0 * distance * distance);
+    float3 lightColor = light.Color.rgb * (light.Intensity * 0.1) * attenuation;
+    
     return float4(lightColor * input.color.rgb, input.color.a);
 }
 

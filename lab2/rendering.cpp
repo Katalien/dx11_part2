@@ -435,14 +435,8 @@ bool Renderer::Frame() {
 }
 
 void Renderer::HandleKeyPress(char key) {
-    if (key == '1') {
-        m_lightManager.ToggleLightIntensity(0); //                                             
-    }
-    else if (key == '2') {
-        m_lightManager.ToggleLightIntensity(1); //                                             
-    }
-    else if (key == '3') {
-        m_lightManager.ToggleLightIntensity(2); //                                              
-    }
+    if (key == '1') m_lightManager.ToggleLightIntensity(0); // Источник 1
+    else if (key == '2') m_lightManager.ToggleLightIntensity(1); // Источник 2
+    else if (key == '3') m_lightManager.ToggleLightIntensity(2); // Источник 3
 }
 

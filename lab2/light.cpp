@@ -31,9 +31,9 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
     //    {}
     //};*/
 
-    m_lights[0] = { {5.0f, 5.0f, 0.0f, 1.0f}, {5.0f, 0.0f, 0.0f, 1.0f}, 10.0f, {} };
-    m_lights[1] = { {-5.0f, 5.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 10.0f, {} }; 
-    m_lights[2] = { {0.0f, 5.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 10.0f, {} }; 
+    m_lights[0] = { {0.2f, 0.0f, 0.0f, 1.0f}, {15.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
+    m_lights[1] = { {0.0f, 0.2f, 0.0f, 1.0f}, {10.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} }; 
+    m_lights[2] = { {0.0f, 0.0f, 0.2f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} }; 
 
     m_intensityLevels[0] = 1.0f;
     m_intensityLevels[1] = 1.0f;
@@ -84,14 +84,16 @@ void LightManager::SetLightIntensity(int index, float intensity) {
 }
 
 void LightManager::ToggleLightIntensity(int index) {
-    if (index == 0 ) {
-        
-        m_intensityLevels[index] *= 10.0f;
-        if (m_intensityLevels[index] > 100.0f) {
-            m_intensityLevels[index] = 1.0f;
-        }
+    if (index < 0 || index >= 3) return;
 
-        
-        m_lights[index].Intensity = m_intensityLevels[index];
-    }
+
+    static const float levels[] = { 1.0f, 10.0f, 100.0f };
+    static int currentLevel = 0;
+
+    currentLevel = (currentLevel + 1) % 3;
+    m_lights[index].Intensity = levels[currentLevel];
+
+//#ifdef _DEBUG
+//    std::cout << "Light " << index << " intensity: " << m_lights[index].Intensity << std::endl;
+//#endif
 }
