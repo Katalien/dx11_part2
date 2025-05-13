@@ -14,10 +14,10 @@ PS_INPUT main(VS_INPUT input)
 {
     PS_INPUT output;
     
-    // Позиция напрямую в NDC пространстве
+    
     output.Pos = float4(input.Pos, 1.0f);
     
-    // Передача текстурных координат
+    
     output.Tex = input.Tex;
     
     return output;

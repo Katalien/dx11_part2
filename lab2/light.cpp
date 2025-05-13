@@ -3,7 +3,7 @@
 #include <string>
 
 LightManager::LightManager() : m_pLightBuffer(nullptr) {
-    // Инициализация источников света с Padding
+    
     /*m_lights[0] = { {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
     m_lights[1] = { {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, 1.0f, {} };
     m_lights[2] = { {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}, 1.0f, {} };*/
@@ -12,21 +12,21 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
 
     m_lights[0] = {
     {-10.0f, 0.0f, 0.0f, 1.0f},
-    {1.0f, 0.0f, 0.0f, 1.0f},  // Красный цвет
+    {1.0f, 0.0f, 0.0f, 1.0f}, 
     10.0f,
     {}
     };
 
     m_lights[1] = {
     {0.0f, 0.0f, 0.0f, 1.0f},
-    {1.0f, 0.0f, 0.0f, 1.0f},  // Зеленый цвет
+    {1.0f, 0.0f, 0.0f, 1.0f},  
         1.0f,
         {}
     };
 
     m_lights[2] = {
     {0.0f, 3.0f, 0.0f, 1.0f},
-    {1.0f, 0.0f, 0.0f, 1.0f},  // Синий цвет
+    {1.0f, 0.0f, 0.0f, 1.0f},  
         1.0f,
         {}
     };
@@ -44,7 +44,7 @@ void LightManager::Init(ID3D11Device* device) {
     if (!device) return;
 
     D3D11_BUFFER_DESC desc = {};
-    desc.ByteWidth = sizeof(PointLight) * 3;  // 48 * 3 = 144 (кратно 16)
+    desc.ByteWidth = sizeof(PointLight) * 3;  
     desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -62,14 +62,14 @@ void LightManager::Update(ID3D11DeviceContext* context) {
     context->Unmap(m_pLightBuffer, 0);
 
 #ifdef _DEBUG
-    // Пример: вывод позиции первого источника света
+    
     OutputDebugStringA(("Light 0 Position: (" +
         std::to_string(m_lights[0].Position.x) + ", " +
         std::to_string(m_lights[0].Position.y) + ", " +
         std::to_string(m_lights[0].Position.z) + ")\n").c_str());
 #endif
 
-    // Устанавливаем буфер в регистр b2 (как в шейдере)
+    
     context->PSSetConstantBuffers(2, 1, &m_pLightBuffer);
 }
 
@@ -80,9 +80,14 @@ void LightManager::SetLightIntensity(int index, float intensity) {
 }
 
 void LightManager::ToggleLightIntensity(int index) {
-    if (index >= 0 && index < 3) {
-        m_intensityLevels[index] = fmodf(m_intensityLevels[index] * 10.0f, 1000.0f);
-        if (m_intensityLevels[index] < 1.0f) m_intensityLevels[index] = 1.0f;
+    if (index == 0 ) {
+        
+        m_intensityLevels[index] *= 10.0f;
+        if (m_intensityLevels[index] > 100.0f) {
+            m_intensityLevels[index] = 1.0f;
+        }
+
+        
         m_lights[index].Intensity = m_intensityLevels[index];
     }
 }

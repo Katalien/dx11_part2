@@ -10,7 +10,7 @@
 using namespace Microsoft::WRL;
 
 bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHeight) {
-    // Создание цепочки текстур для downsampling
+    // textures downsampling
     UINT currentWidth = srcWidth;
     UINT currentHeight = srcHeight;
 
@@ -25,12 +25,12 @@ bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHei
         m_downsampleTargets.push_back(target);
     }
 
-    // Компиляция шейдеров
+    
     ComPtr<ID3DBlob> vsBlob;
     ComPtr<ID3DBlob> psBlob;
     ComPtr<ID3DBlob> errorBlob;
 
-    // Вершинный шейдер
+    
     HRESULT hr = D3DCompileFromFile(
         L"FullscreenVS.hlsl",
         nullptr,
@@ -57,7 +57,7 @@ bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHei
         &m_pFullscreenVS
     );
 
-    // Пиксельный шейдер
+    
     hr = D3DCompileFromFile(
         L"DownsamplePS.hlsl",
         nullptr,
@@ -84,7 +84,7 @@ bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHei
         &m_pDownsamplePS
     );
 
-    // Создание input layout
+    
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
@@ -98,7 +98,7 @@ bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHei
         &m_pInputLayout
     );
 
-    // Создание сэмплера
+    
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -122,21 +122,21 @@ void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderR
     ID3D11ShaderResourceView* currentSRV = srcSRV;
 
     for (auto& target : m_downsampleTargets) {
-        // Отвязываем предыдущие ресурсы
+        
         ID3D11RenderTargetView* nullRTV = nullptr;
         ID3D11ShaderResourceView* nullSRVs[1] = { nullptr };
         context->OMSetRenderTargets(1, &nullRTV, nullptr);
         context->PSSetShaderResources(0, 1, nullSRVs);
 
-        // Очищаем цель рендеринга
+        
         const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         context->ClearRenderTargetView(target.rtv.Get(), clearColor);
 
-        // Устанавливаем новые ресурсы
+        
         context->OMSetRenderTargets(1, target.rtv.GetAddressOf(), nullptr);
         context->PSSetShaderResources(0, 1, &currentSRV);
 
-        // Настройка вьюпорта
+        
         D3D11_VIEWPORT viewport = {};
         viewport.Width = static_cast<float>(target.width);
         viewport.Height = static_cast<float>(target.height);
@@ -144,14 +144,14 @@ void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderR
         viewport.MaxDepth = 1.0f;
         context->RSSetViewports(1, &viewport);
 
-        // Отрисовка полноэкранного треугольника
+        
         context->Draw(3, 0);
 
-        // Переключаемся на результат текущего этапа
+        
         currentSRV = target.srv.Get();
     }
 
-    // Финализация - отвязываем все ресурсы
+    
     ID3D11RenderTargetView* finalNullRTV = nullptr;
     ID3D11ShaderResourceView* finalNullSRVs[1] = { nullptr };
     context->OMSetRenderTargets(1, &finalNullRTV, nullptr);
@@ -169,7 +169,7 @@ bool BrightnessCalculator::CreateDownsampleTarget(
     UINT height,
     DownsampleTarget& target
 ) {
-    // Создание текстуры
+    
     D3D11_TEXTURE2D_DESC texDesc = {};
     texDesc.Width = width;
     texDesc.Height = height;
@@ -183,7 +183,7 @@ bool BrightnessCalculator::CreateDownsampleTarget(
     HRESULT hr = device->CreateTexture2D(&texDesc, nullptr, &target.texture);
     if (FAILED(hr)) return false;
 
-    // Создание RTV
+    // RTV
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
     rtvDesc.Format = texDesc.Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -195,7 +195,7 @@ bool BrightnessCalculator::CreateDownsampleTarget(
     );
     if (FAILED(hr)) return false;
 
-    // Создание SRV
+    // SRV
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = texDesc.Format;
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;

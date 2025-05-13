@@ -140,16 +140,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
 
     case WM_KEYDOWN: {
-        char key = static_cast<char>(wParam); // Получаем код клавиши
-        if (pRenderer && pRenderer->GetCamera()) {
-            pRenderer->GetCamera()->KeyPressed(key); // Передаём нажатие клавиши в камеру
-        }
-        break;
+        // Получаем виртуальный код клавиши
+        UINT virtualKey = static_cast<UINT>(wParam);
+        char key = static_cast<char>(MapVirtualKey(virtualKey, MAPVK_VK_TO_CHAR));
 
+        
+        key = tolower(key);
 
-         // Получаем код клавиши
+        // Передача нажатия в камеру и рендерер
         if (pRenderer) {
-            pRenderer->HandleKeyPress(key); // Передаём нажатие клавиши в рендерер
+            if (pRenderer->GetCamera()) {
+                pRenderer->GetCamera()->KeyPressed(key);
+            }
+            pRenderer->HandleKeyPress(key);
         }
         break;
     }

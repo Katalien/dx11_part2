@@ -1,4 +1,4 @@
-// Разделяем буферы на два отдельных с разными регистрами
+
 cbuffer SceneMatrixBuffer : register(b0)
 {
     float4x4 mViewProjectionMatrix;
@@ -27,9 +27,7 @@ struct VS_OUTPUT
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
-    // Умножаем позицию сначала на мировую матрицу, затем на view-projection
-    //float4 worldPos = mul(input.position, mWorldMatrix);
-    //output.sv_position = mul(worldPos, mViewProjectionMatrix);
+
     
     float4 worldPos = mul(mWorldMatrix, input.position);
     output.sv_position = mul(mViewProjectionMatrix, worldPos);

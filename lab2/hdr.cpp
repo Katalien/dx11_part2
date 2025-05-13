@@ -31,7 +31,7 @@ struct AdaptationBuffer {
 bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     HRESULT hr;
 
-    // 1. Создание HDR текстуры
+    
     D3D11_TEXTURE2D_DESC textureDesc = {};
     textureDesc.Width = width;
     textureDesc.Height = height;
@@ -48,20 +48,20 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     hr = device->CreateTexture2D(&textureDesc, nullptr, &m_pHDRTexture);
     if (FAILED(hr)) return false;
 
-    // 2. Создание RTV для HDR текстуры
+    
     hr = device->CreateRenderTargetView(m_pHDRTexture, nullptr, &m_pHDRRTV);
     if (FAILED(hr)) return false;
 
-    // 3. Создание SRV для HDR текстуры
+    
     hr = device->CreateShaderResourceView(m_pHDRTexture, nullptr, &m_pHDRSRV);
     if (FAILED(hr)) return false;
 
-    // 4. Инициализация расчета яркости
+    
     if (!m_brightnessCalc.Init(device, width, height)) {
         return false;
     }
 
-    // 5. Создание вершинного буфера для полноэкранного квада
+    
     SimpleVertex vertices[] = {
         { XMFLOAT3(-1.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },
         { XMFLOAT3(1.0f, 1.0f, 0.0f),   XMFLOAT2(1.0f, 0.0f) },
@@ -78,7 +78,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     hr = device->CreateBuffer(&vbDesc, &initData, &m_pQuadVB);
     if (FAILED(hr)) return false;
 
-    // 6. Компиляция шейдеров
+    
     ID3DBlob* vsBlob = nullptr;
     hr = D3DCompileFromFile(L"ToneMappingVS.hlsl", nullptr, nullptr,
         "main", "vs_5_0", 0, 0, &vsBlob, nullptr);
@@ -101,7 +101,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     }
     if (FAILED(hr)) return false;
 
-    // 7. Создание входного лэйаута
+    
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
@@ -113,7 +113,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
         &m_pInputLayout);
     if (FAILED(hr)) return false;
 
-    // 8. Создание сэмплера
+    // sample
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -123,7 +123,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     hr = device->CreateSamplerState(&sampDesc, &m_pSampler);
     if (FAILED(hr)) return false;
 
-    // 9. Создание буфера адаптации
+    // buffffer adaptation
     D3D11_BUFFER_DESC cbDesc = {};
     cbDesc.ByteWidth = sizeof(AdaptationBuffer);
     cbDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -144,15 +144,15 @@ void HDR::Render(
     ID3D11ShaderResourceView* sourceTexture,
     ID3D11RenderTargetView* targetRTV
 ) {
-    // 1. Расчет средней яркости
+    // avg yarkost
     m_brightnessCalc.Calculate(context, sourceTexture);
 
-    // 2. Установка целевого RTV и очистка
+    
     const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     context->ClearRenderTargetView(targetRTV, clearColor);
     context->OMSetRenderTargets(1, &targetRTV, nullptr);
 
-    // 3. Настройка вьюпорта
+    
     D3D11_VIEWPORT viewport = {};
     viewport.Width = static_cast<float>(m_width);
     viewport.Height = static_cast<float>(m_height);
@@ -160,8 +160,10 @@ void HDR::Render(
     viewport.MaxDepth = 1.0f;
     context->RSSetViewports(1, &viewport);
 
-    // 4. Обновление буфера адаптации
+    // Update buffer adaptation
     AdaptationBuffer adaptData;
+    /*float safeDelta = (m_deltaTime > 0.1f) ? 0.1f : m_deltaTime;
+    adaptData.DeltaTime = safeDelta;*/
     adaptData.DeltaTime = m_deltaTime;
     adaptData.AdaptationSpeed = 0.1f;
 
@@ -170,27 +172,27 @@ void HDR::Render(
     memcpy(mapped.pData, &adaptData, sizeof(AdaptationBuffer));
     context->Unmap(m_pAdaptationBuffer, 0);
 
-    // 5. Настройка шейдеров
+    // Shaders shaders shares
     context->VSSetShader(m_pToneMappingVS, nullptr, 0);
     context->PSSetShader(m_pToneMappingPS, nullptr, 0);
 
-    // 6. Привязка ресурсов
+    // privyaz resorces
     ID3D11ShaderResourceView* srvs[] = { sourceTexture, m_brightnessCalc.GetResultSRV() };
     context->PSSetShaderResources(0, 2, srvs);
     context->PSSetSamplers(0, 1, &m_pSampler);
     context->PSSetConstantBuffers(0, 1, &m_pAdaptationBuffer);
 
-    // 7. Настройка вершинного буфера
+    // vetrex bufffffferrrrrr
     UINT stride = sizeof(SimpleVertex);
     UINT offset = 0;
     context->IASetVertexBuffers(0, 1, &m_pQuadVB, &stride, &offset);
     context->IASetInputLayout(m_pInputLayout);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-    // 8. Отрисовка
+    // draw yo
     context->Draw(4, 0);
 
-    // 9. Отвязка ресурсов
+    // otvyaz resorse
     ID3D11ShaderResourceView* nullSRVs[2] = { nullptr, nullptr };
     context->PSSetShaderResources(0, 2, nullSRVs);
 }
@@ -200,5 +202,5 @@ ID3D11ShaderResourceView* HDR::GetHDRTexture() const {
 }
 
 ID3D11RenderTargetView* HDR::GetHDRRTV() const {
-    return m_pHDRRTV; // Возвращаем RTV для HDR-текстуры
+    return m_pHDRRTV;
 }

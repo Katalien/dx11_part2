@@ -31,26 +31,26 @@ float3 Uncharted2Tonemap(float3 x)
 
 float4 main(PS_INPUT input) : SV_Target
 {
-    // Чтение HDR цвета
+    // read hdr color
     float3 hdrColor = HDRTexture.Sample(Sampler, input.Tex).rgb;
     
-    // Получение средней яркости
+    // avg
     float avgLum = AvgLuminance.Sample(Sampler, float2(0.5, 0.5)).r;
     
     // Адаптация яркости
     static float adaptedLum = 1.0;
     adaptedLum = lerp(adaptedLum, avgLum, DeltaTime * AdaptationSpeed);
     
-    // Вычисление экспозиции
+    // calc exp
     float exposure = 1.0 / (adaptedLum + 0.0001);
     float3 exposedColor = hdrColor * exposure;
     
-    // Применение тонального отображения
+    // tone
     float3 curr = Uncharted2Tonemap(exposedColor);
     float3 whiteScale = 1.0 / Uncharted2Tonemap(W);
     float3 result = curr * whiteScale;
     
-    // Гамма-коррекция
+    // gamma
     result = pow(result, 1.0 / 2.2);
     
     return float4(result, 1.0);

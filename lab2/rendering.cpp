@@ -166,13 +166,13 @@ bool Renderer::Resize(UINT width, UINT height) {
     return true;
 }
 bool Renderer::Render() {
-    // Очистка HDR цели рендеринга
+    // clear 
     static const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     ID3D11RenderTargetView* hdrRTV = m_hdr.GetHDRRTV();
     m_pContext->OMSetRenderTargets(1, &hdrRTV, nullptr);
     m_pContext->ClearRenderTargetView(hdrRTV, clearColor);
 
-    // Настройка вьюпорта
+    // viewwwport
     D3D11_VIEWPORT viewport = {};
     viewport.Width = static_cast<float>(m_width);
     viewport.Height = static_cast<float>(m_height);
@@ -180,15 +180,15 @@ bool Renderer::Render() {
     viewport.MaxDepth = 1.0f;
     m_pContext->RSSetViewports(1, &viewport);
 
-    // Рендеринг 3D-сцены в HDR текстуру
+    // 3d -> hdr
     m_pContext->OMSetRenderTargets(1, &hdrRTV, nullptr);
     RenderScene();
 
-    // Тональная коррекция и вывод на экран
+    // tone
     ID3D11RenderTargetView* backBufferRTV = m_pBackBufferRTV;
     m_hdr.Render(m_pContext, m_hdr.GetHDRTexture(), backBufferRTV);
 
-    // Презентация
+    // present
     HRESULT hr = m_pSwapChain->Present(0, 0);
     return SUCCEEDED(hr);
 }
@@ -406,7 +406,7 @@ bool Renderer::Frame() {
         timeStart = timeCur;
     }
     t = (timeCur - timeStart) / 1000.0f;
-
+    m_hdr.SetDeltaTime(t);
     // world matrix
     WorldMatrixBuffer worldMatrixBuffer;
 

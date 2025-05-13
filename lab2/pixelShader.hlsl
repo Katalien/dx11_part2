@@ -1,10 +1,10 @@
 struct PointLight
 {
-    float4 Position; // В мировых координатах
+    float4 Position; // world
     float4 Color;
     float Intensity;
     
-    //доавбляем выравнивание
+ 
     float3 Padding;
     
 };
@@ -17,7 +17,7 @@ cbuffer LightBuffer : register(b2)
 struct PS_INPUT
 {
     float4 sv_position : SV_POSITION;
-    float4 color : COLOR; // Порядок должен совпадать с VS_OUTPUT!
+    float4 color : COLOR;
     float2 uv : TEXCOORD0;
     float3 world_position : TEXCOORD1;
 };
