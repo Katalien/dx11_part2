@@ -1,5 +1,5 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: промежуточный каталог (x64\Debug\) содержит файлы, которые используются совместно с другим проектом (lab2_dx11.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  compilation object save succeeded; see C:\Users\kns_user\Desktop\aaaa\dx11_part2\lab2\x64\Debug\ToneMappingPS.cso
+  light.cpp
   lab2_dx11.vcxproj -> C:\Users\kns_user\Desktop\aaaa\dx11_part2\lab2\x64\Debug\lab1_dx11.exe
   Скопировано файлов:         1.
   Скопировано файлов:         1.
