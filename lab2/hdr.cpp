@@ -139,62 +139,54 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     return true;
 }
 
-void HDR::Render(
-    ID3D11DeviceContext* context,
+void HDR::Render(ID3D11DeviceContext* context,
     ID3D11ShaderResourceView* sourceTexture,
-    ID3D11RenderTargetView* targetRTV
-) {
-    // avg yarkost
+    ID3D11RenderTargetView* targetRTV) {
+    // calc lum
     m_brightnessCalc.Calculate(context, sourceTexture);
 
     
-    const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    context->ClearRenderTargetView(targetRTV, clearColor);
     context->OMSetRenderTargets(1, &targetRTV, nullptr);
 
     
-    D3D11_VIEWPORT viewport = {};
-    viewport.Width = static_cast<float>(m_width);
-    viewport.Height = static_cast<float>(m_height);
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-    context->RSSetViewports(1, &viewport);
-
-    // Update buffer adaptation
     AdaptationBuffer adaptData;
-    /*float safeDelta = (m_deltaTime > 0.1f) ? 0.1f : m_deltaTime;
-    adaptData.DeltaTime = safeDelta;*/
     adaptData.DeltaTime = m_deltaTime;
-    adaptData.AdaptationSpeed = 0.1f;
+    adaptData.AdaptationSpeed = 0.05f;
+    adaptData.MinLum = 0.01f;  
+    adaptData.MaxLum = 100.0f; 
 
     D3D11_MAPPED_SUBRESOURCE mapped;
     context->Map(m_pAdaptationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     memcpy(mapped.pData, &adaptData, sizeof(AdaptationBuffer));
     context->Unmap(m_pAdaptationBuffer, 0);
 
-    // Shaders shaders shares
+    
     context->VSSetShader(m_pToneMappingVS, nullptr, 0);
     context->PSSetShader(m_pToneMappingPS, nullptr, 0);
 
-    // privyaz resorces
-    ID3D11ShaderResourceView* srvs[] = { sourceTexture, m_brightnessCalc.GetResultSRV() };
-    context->PSSetShaderResources(0, 2, srvs);
-    context->PSSetSamplers(0, 1, &m_pSampler);
+    
+    ID3D11ShaderResourceView* srvs[] = {
+        sourceTexture,
+        m_brightnessCalc.GetAvgSRV(),
+        m_brightnessCalc.GetMinSRV(),
+        m_brightnessCalc.GetMaxSRV()
+    };
+    context->PSSetShaderResources(0, 4, srvs);
+
+    
     context->PSSetConstantBuffers(0, 1, &m_pAdaptationBuffer);
 
-    // vetrex bufffffferrrrrr
-    UINT stride = sizeof(SimpleVertex);
+    // Рисуем
+    UINT stride = sizeof(float) * 5; 
     UINT offset = 0;
     context->IASetVertexBuffers(0, 1, &m_pQuadVB, &stride, &offset);
     context->IASetInputLayout(m_pInputLayout);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-    // draw yo
     context->Draw(4, 0);
 
-    // otvyaz resorse
-    ID3D11ShaderResourceView* nullSRVs[2] = { nullptr, nullptr };
-    context->PSSetShaderResources(0, 2, nullSRVs);
+    
+    ID3D11ShaderResourceView* nullSRVs[4] = { nullptr, nullptr, nullptr, nullptr };
+    context->PSSetShaderResources(0, 4, nullSRVs);
 }
 
 ID3D11ShaderResourceView* HDR::GetHDRTexture() const {

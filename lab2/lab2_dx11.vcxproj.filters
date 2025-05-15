@@ -96,6 +96,7 @@
     <FxCompile Include="ToneMappingPS.hlsl" />
     <FxCompile Include="FullscreenVS.hlsl" />
     <FxCompile Include="DownsamplePS.hlsl" />
+    <FxCompile Include="BrightnessPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pixelShader.hlsl">

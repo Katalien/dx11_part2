@@ -1,175 +1,85 @@
 #include "BrightnessCalculator.h"
-#include <d3d11.h>
 #include <d3dcompiler.h>
-#include <vector>
 #include <algorithm>
 
-#pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-using namespace Microsoft::WRL;
-
 bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHeight) {
-    // textures downsampling
-    UINT currentWidth = srcWidth;
-    UINT currentHeight = srcHeight;
+    HRESULT hr;
 
-    while (currentWidth > 1 || currentHeight > 1) {
-        currentWidth = std::max<UINT>(currentWidth / 2, 1);
-        currentHeight = std::max<UINT>(currentHeight / 2, 1);
+    // cepochka
+    UINT width = srcWidth;
+    UINT height = srcHeight;
 
-        DownsampleTarget target;
-        if (!CreateDownsampleTarget(device, currentWidth, currentHeight, target)) {
-            return false;
-        }
-        m_downsampleTargets.push_back(target);
+    while (width > 1 || height > 1) {
+        width = std::max<UINT>(width / 2, 1);
+        height = std::max<UINT>(height / 2, 1);
+
+        DownsampleLevel level;
+        if (!CreateDownsampleTarget(device, width, height, level.avg)) return false;
+        if (!CreateDownsampleTarget(device, width, height, level.min)) return false;
+        if (!CreateDownsampleTarget(device, width, height, level.max)) return false;
+
+        m_levels.push_back(level);
     }
 
-    
-    ComPtr<ID3DBlob> vsBlob;
-    ComPtr<ID3DBlob> psBlob;
-    ComPtr<ID3DBlob> errorBlob;
+    // shaders
+    ComPtr<ID3DBlob> vsBlob, psBlob, errorBlob;
 
-    
-    HRESULT hr = D3DCompileFromFile(
-        L"FullscreenVS.hlsl",
-        nullptr,
-        nullptr,
-        "main",
-        "vs_5_0",
-        0,
-        0,
-        &vsBlob,
-        &errorBlob
-    );
+    // Vertex shader
+    hr = D3DCompileFromFile(L"FullscreenVS.hlsl", nullptr, nullptr, "main",
+        "vs_5_0", 0, 0, &vsBlob, &errorBlob);
+    if (FAILED(hr)) return false;
 
-    if (FAILED(hr)) {
-        if (errorBlob) {
-            OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-        }
-        return false;
-    }
-
-    hr = device->CreateVertexShader(
-        vsBlob->GetBufferPointer(),
+    hr = device->CreateVertexShader(vsBlob->GetBufferPointer(),
         vsBlob->GetBufferSize(),
-        nullptr,
-        &m_pFullscreenVS
-    );
+        nullptr, &m_pFullscreenVS);
+    if (FAILED(hr)) return false;
 
-    
-    hr = D3DCompileFromFile(
-        L"DownsamplePS.hlsl",
-        nullptr,
-        nullptr,
-        "main",
-        "ps_5_0",
-        0,
-        0,
-        &psBlob,
-        &errorBlob
-    );
+    // Pixel shader 1st level
+    hr = D3DCompileFromFile(L"BrightnessPS.hlsl", nullptr, nullptr, "main",
+        "ps_5_0", 0, 0, &psBlob, &errorBlob);
+    if (FAILED(hr)) return false;
 
-    if (FAILED(hr)) {
-        if (errorBlob) {
-            OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-        }
-        return false;
-    }
-
-    hr = device->CreatePixelShader(
-        psBlob->GetBufferPointer(),
+    hr = device->CreatePixelShader(psBlob->GetBufferPointer(),
         psBlob->GetBufferSize(),
-        nullptr,
-        &m_pDownsamplePS
-    );
+        nullptr, &m_pBrightnessPS);
+    if (FAILED(hr)) return false;
 
-    
-    D3D11_INPUT_ELEMENT_DESC layout[] = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
+    // Pixel shader downsample
+    hr = D3DCompileFromFile(L"DownsamplePS.hlsl", nullptr, nullptr, "main",
+        "ps_5_0", 0, 0, &psBlob, &errorBlob);
+    if (FAILED(hr)) return false;
 
-    hr = device->CreateInputLayout(
-        layout,
-        ARRAYSIZE(layout),
-        vsBlob->GetBufferPointer(),
-        vsBlob->GetBufferSize(),
-        &m_pInputLayout
-    );
+    hr = device->CreatePixelShader(psBlob->GetBufferPointer(),
+        psBlob->GetBufferSize(),
+        nullptr, &m_pDownsamplePS);
+    if (FAILED(hr)) return false;
 
-    
+    // sample
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-    hr = device->CreateSamplerState(&sampDesc, &m_pSampler);
+    hr = device->CreateSamplerState(&sampDesc, &m_pSamplerLinear);
+    if (FAILED(hr)) return false;
+
+    // sample min
+    sampDesc.Filter = D3D11_FILTER_MINIMUM_MIN_MAG_MIP_LINEAR;
+    hr = device->CreateSamplerState(&sampDesc, &m_pSamplerMin);
+    if (FAILED(hr)) return false;
+
+    // sample max
+    sampDesc.Filter = D3D11_FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR;
+    hr = device->CreateSamplerState(&sampDesc, &m_pSamplerMax);
 
     return SUCCEEDED(hr);
 }
 
-void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderResourceView* srcSRV) {
-    context->VSSetShader(m_pFullscreenVS.Get(), nullptr, 0);
-    context->PSSetShader(m_pDownsamplePS.Get(), nullptr, 0);
-    context->IASetInputLayout(m_pInputLayout.Get());
-    context->PSSetSamplers(0, 1, m_pSampler.GetAddressOf());
-
-    ID3D11ShaderResourceView* currentSRV = srcSRV;
-
-    for (auto& target : m_downsampleTargets) {
-        
-        ID3D11RenderTargetView* nullRTV = nullptr;
-        ID3D11ShaderResourceView* nullSRVs[1] = { nullptr };
-        context->OMSetRenderTargets(1, &nullRTV, nullptr);
-        context->PSSetShaderResources(0, 1, nullSRVs);
-
-        
-        const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        context->ClearRenderTargetView(target.rtv.Get(), clearColor);
-
-        
-        context->OMSetRenderTargets(1, target.rtv.GetAddressOf(), nullptr);
-        context->PSSetShaderResources(0, 1, &currentSRV);
-
-        
-        D3D11_VIEWPORT viewport = {};
-        viewport.Width = static_cast<float>(target.width);
-        viewport.Height = static_cast<float>(target.height);
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
-        context->RSSetViewports(1, &viewport);
-
-        
-        context->Draw(3, 0);
-
-        
-        currentSRV = target.srv.Get();
-    }
-
-    
-    ID3D11RenderTargetView* finalNullRTV = nullptr;
-    ID3D11ShaderResourceView* finalNullSRVs[1] = { nullptr };
-    context->OMSetRenderTargets(1, &finalNullRTV, nullptr);
-    context->PSSetShaderResources(0, 1, finalNullSRVs);
-}
-
-ID3D11ShaderResourceView* BrightnessCalculator::GetResultSRV() const {
-    if (m_downsampleTargets.empty()) return nullptr;
-    return m_downsampleTargets.back().srv.Get();
-}
-
-bool BrightnessCalculator::CreateDownsampleTarget(
-    ID3D11Device* device,
-    UINT width,
-    UINT height,
-    DownsampleTarget& target
-) {
-    
+bool BrightnessCalculator::CreateDownsampleTarget(ID3D11Device* device, UINT width, UINT height, DownsampleTarget& target) {
     D3D11_TEXTURE2D_DESC texDesc = {};
     texDesc.Width = width;
     texDesc.Height = height;
@@ -184,45 +94,90 @@ bool BrightnessCalculator::CreateDownsampleTarget(
     if (FAILED(hr)) return false;
 
     // RTV
-    D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-    rtvDesc.Format = texDesc.Format;
-    rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
-    hr = device->CreateRenderTargetView(
-        target.texture.Get(),
-        &rtvDesc,
-        &target.rtv
-    );
+    hr = device->CreateRenderTargetView(target.texture.Get(), nullptr, &target.rtv);
     if (FAILED(hr)) return false;
 
     // SRV
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = texDesc.Format;
-    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = 1;
-
-    hr = device->CreateShaderResourceView(
-        target.texture.Get(),
-        &srvDesc,
-        &target.srv
-    );
+    hr = device->CreateShaderResourceView(target.texture.Get(), nullptr, &target.srv);
+    if (FAILED(hr)) return false;
 
     target.width = width;
     target.height = height;
 
-    return SUCCEEDED(hr);
+    return true;
+}
+
+void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderResourceView* srcSRV) {
+    context->VSSetShader(m_pFullscreenVS.Get(), nullptr, 0);
+    context->IASetInputLayout(nullptr);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+    // 
+    ID3D11SamplerState* samplers[] = { m_pSamplerLinear.Get(),
+                                      m_pSamplerMin.Get(),
+                                      m_pSamplerMax.Get() };
+    context->PSSetSamplers(0, 3, samplers);
+
+    // go by levels
+    for (int i = m_levels.size() - 1; i >= 0; --i) {
+        const auto& level = m_levels[i];
+
+        // rtv
+        ID3D11RenderTargetView* rtvs[] = { level.avg.rtv.Get(),
+                                          level.min.rtv.Get(),
+                                          level.max.rtv.Get() };
+        context->OMSetRenderTargets(3, rtvs, nullptr);
+
+        
+        const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        context->ClearRenderTargetView(level.avg.rtv.Get(), clearColor);
+        context->ClearRenderTargetView(level.min.rtv.Get(), clearColor);
+        context->ClearRenderTargetView(level.max.rtv.Get(), clearColor);
+
+        
+        D3D11_VIEWPORT viewport = {};
+        viewport.Width = static_cast<float>(level.avg.width);
+        viewport.Height = static_cast<float>(level.avg.height);
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
+        context->RSSetViewports(1, &viewport);
+
+        
+        if (i == m_levels.size() - 1) {
+            // 1st level
+            context->PSSetShader(m_pBrightnessPS.Get(), nullptr, 0);
+            ID3D11ShaderResourceView* srvs[] = { srcSRV, srcSRV, srcSRV };
+            context->PSSetShaderResources(0, 3, srvs);
+        }
+        else {
+            // != 1st level
+            context->PSSetShader(m_pDownsamplePS.Get(), nullptr, 0);
+            ID3D11ShaderResourceView* srvs[] = {
+                m_levels[i + 1].avg.srv.Get(),
+                m_levels[i + 1].min.srv.Get(),
+                m_levels[i + 1].max.srv.Get()
+            };
+            context->PSSetShaderResources(0, 3, srvs);
+        }
+
+        
+        context->Draw(4, 0);
+    }
+
+   
+    ID3D11RenderTargetView* nullRTVs[3] = { nullptr, nullptr, nullptr };
+    context->OMSetRenderTargets(3, nullRTVs, nullptr);
+
+    ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
+    context->PSSetShaderResources(0, 3, nullSRVs);
 }
 
 void BrightnessCalculator::Release() {
-    for (auto& target : m_downsampleTargets) {
-        target.texture.Reset();
-        target.rtv.Reset();
-        target.srv.Reset();
-    }
-    m_downsampleTargets.clear();
-
+    m_levels.clear();
     m_pFullscreenVS.Reset();
+    m_pBrightnessPS.Reset();
     m_pDownsamplePS.Reset();
-    m_pInputLayout.Reset();
-    m_pSampler.Reset();
+    m_pSamplerLinear.Reset();
+    m_pSamplerMin.Reset();
+    m_pSamplerMax.Reset();
 }

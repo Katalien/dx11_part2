@@ -1,26 +1,48 @@
-Texture2D HDRTexture : register(t0);
+Texture2D AvgTexture : register(t0);
+Texture2D MinTexture : register(t1);
+Texture2D MaxTexture : register(t2);
 SamplerState Sampler : register(s0);
 
-float4 main(float4 position : SV_POSITION, float2 texCoord : TEXCOORD) : SV_TARGET
+struct PS_OUTPUT
 {
-    uint width, height;
-    HDRTexture.GetDimensions(width, height);
-    float2 texelSize = 1.0 / float2(width, height);
+    float4 avg : SV_Target0;
+    float4 min : SV_Target1;
+    float4 max : SV_Target2;
+};
+
+PS_OUTPUT main(float4 pos : SV_POSITION, float2 texCoord : TEXCOORD)
+{
+    PS_OUTPUT output;
     
+    // 
+    float2 texelSize = 1.0 / float2(1920, 1080); 
     
-    float3 color1 = HDRTexture.Sample(Sampler, texCoord + float2(-0.5, -0.5) * texelSize).rgb;
-    float3 color2 = HDRTexture.Sample(Sampler, texCoord + float2(-0.5, 0.5) * texelSize).rgb;
-    float3 color3 = HDRTexture.Sample(Sampler, texCoord + float2(0.5, -0.5) * texelSize).rgb;
-    float3 color4 = HDRTexture.Sample(Sampler, texCoord + float2(0.5, 0.5) * texelSize).rgb;
+    float4 samplesAvg[4];
+    samplesAvg[0] = AvgTexture.Sample(Sampler, texCoord + float2(-0.5, -0.5) * texelSize);
+    samplesAvg[1] = AvgTexture.Sample(Sampler, texCoord + float2(-0.5, 0.5) * texelSize);
+    samplesAvg[2] = AvgTexture.Sample(Sampler, texCoord + float2(0.5, -0.5) * texelSize);
+    samplesAvg[3] = AvgTexture.Sample(Sampler, texCoord + float2(0.5, 0.5) * texelSize);
     
+    float4 samplesMin[4];
+    samplesMin[0] = MinTexture.Sample(Sampler, texCoord + float2(-0.5, -0.5) * texelSize);
+    samplesMin[1] = MinTexture.Sample(Sampler, texCoord + float2(-0.5, 0.5) * texelSize);
+    samplesMin[2] = MinTexture.Sample(Sampler, texCoord + float2(0.5, -0.5) * texelSize);
+    samplesMin[3] = MinTexture.Sample(Sampler, texCoord + float2(0.5, 0.5) * texelSize);
     
-    float lum1 = dot(color1, float3(0.2126, 0.7152, 0.0722));
-    float lum2 = dot(color2, float3(0.2126, 0.7152, 0.0722));
-    float lum3 = dot(color3, float3(0.2126, 0.7152, 0.0722));
-    float lum4 = dot(color4, float3(0.2126, 0.7152, 0.0722));
+    float4 samplesMax[4];
+    samplesMax[0] = MaxTexture.Sample(Sampler, texCoord + float2(-0.5, -0.5) * texelSize);
+    samplesMax[1] = MaxTexture.Sample(Sampler, texCoord + float2(-0.5, 0.5) * texelSize);
+    samplesMax[2] = MaxTexture.Sample(Sampler, texCoord + float2(0.5, -0.5) * texelSize);
+    samplesMax[3] = MaxTexture.Sample(Sampler, texCoord + float2(0.5, 0.5) * texelSize);
     
+    // avg
+    output.avg = (samplesAvg[0] + samplesAvg[1] + samplesAvg[2] + samplesAvg[3]) * 0.25;
     
-    float avgLum = (lum1 + lum2 + lum3 + lum4) * 0.25;
+    // min
+    output.min = min(min(samplesMin[0], samplesMin[1]), min(samplesMin[2], samplesMin[3]));
     
-    return float4(avgLum, avgLum, avgLum, 1);
+    // max
+    output.max = max(max(samplesMax[0], samplesMax[1]), max(samplesMax[2], samplesMax[3]));
+    
+    return output;
 }

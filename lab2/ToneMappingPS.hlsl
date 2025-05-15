@@ -1,13 +1,15 @@
-
-
 Texture2D HDRTexture : register(t0);
 Texture2D AvgLuminance : register(t1);
+Texture2D MinLuminance : register(t2);
+Texture2D MaxLuminance : register(t3);
 SamplerState Sampler : register(s0);
 
 cbuffer AdaptationBuffer : register(b0)
 {
     float DeltaTime;
     float AdaptationSpeed;
+    float MinLum;
+    float MaxLum;
 };
 
 static const float A = 0.15;
@@ -18,34 +20,31 @@ static const float E = 0.02;
 static const float F = 0.30;
 static const float W = 11.2;
 
-struct PS_INPUT
-{
-    float4 Pos : SV_POSITION;
-    float2 Tex : TEXCOORD0;
-};
-
 float3 Uncharted2Tonemap(float3 x)
 {
     return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
 }
 
-float4 main(PS_INPUT input) : SV_Target
+float4 main(float4 pos : SV_POSITION, float2 texCoord : TEXCOORD) : SV_Target
 {
-    // read hdr color
-    float3 hdrColor = HDRTexture.Sample(Sampler, input.Tex).rgb;
+    // hdr
+    float3 hdrColor = HDRTexture.Sample(Sampler, texCoord).rgb;
     
-    // avg
-    float avgLum = AvgLuminance.Sample(Sampler, float2(0.5, 0.5)).r;
+    // read min max avg
+    float avgLum = exp(AvgLuminance.Sample(Sampler, float2(0.5, 0.5)).r) - 1.0;
+    float minLum = MinLuminance.Sample(Sampler, float2(0.5, 0.5)).r;
+    float maxLum = MaxLuminance.Sample(Sampler, float2(0.5, 0.5)).r;
     
-    // јдаптаци€ €ркости
-    static float adaptedLum = 1.0;
+    // adapt -> exp
+    float adaptedLum = avgLum;
+    float adaptation = 1.0 - exp(-DeltaTime * AdaptationSpeed);
+    adaptedLum = lerp(adaptedLum, avgLum, adaptation);
     
-    float adaptationFactor = 1.0 - exp(-DeltaTime * AdaptationSpeed);
-    adaptedLum = lerp(adaptedLum, avgLum, adaptationFactor);
-    //adaptedLum = lerp(adaptedLum, avgLum, DeltaTime * AdaptationSpeed);
+    // expose
+    float keyValue = 1.03 - 2.0 / (2.0 + log(adaptedLum + 1.0));
+    float exposure = keyValue / clamp(adaptedLum, minLum, maxLum);
     
-    // calc exp
-    float exposure = 1.0 / (adaptedLum + 0.0001);
+    
     float3 exposedColor = hdrColor * exposure;
     
     // tone

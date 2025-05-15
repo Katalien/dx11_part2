@@ -7,6 +7,8 @@
 #include <directxmath.h>
 #include "BrightnessCalculator.h"
 
+
+
 class HDR {
 public:
     HDR();
@@ -21,16 +23,22 @@ public:
     BrightnessCalculator m_brightnessCalc;
     ID3D11Buffer* m_pAdaptationBuffer;
     float m_adaptedLuminance = 1.0f;
-
+    
+    struct AdaptationBuffer {
+        float DeltaTime;
+        float AdaptationSpeed;
+        float MinLum;
+        float MaxLum;
+    };
 private:
     ID3D11Texture2D* m_pHDRTexture;
     ID3D11RenderTargetView* m_pHDRRTV;
     ID3D11ShaderResourceView* m_pHDRSRV;
     ID3D11PixelShader* m_pToneMappingPS;
     ID3D11VertexShader* m_pToneMappingVS;
-    ID3D11Buffer* m_pQuadVB = nullptr;        // Вершинный буфер квада
-    ID3D11InputLayout* m_pInputLayout = nullptr; // Лэйаут ввода
-    ID3D11SamplerState* m_pSampler = nullptr; // Сэмплер
+    ID3D11Buffer* m_pQuadVB = nullptr;        
+    ID3D11InputLayout* m_pInputLayout = nullptr; 
+    ID3D11SamplerState* m_pSampler = nullptr; 
     UINT m_width;
     UINT m_height;
 };
