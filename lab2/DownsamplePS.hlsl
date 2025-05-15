@@ -14,35 +14,52 @@ PS_OUTPUT main(float4 pos : SV_POSITION, float2 texCoord : TEXCOORD)
 {
     PS_OUTPUT output;
     
+    // real size
+    uint width, height;
+    AvgTexture.GetDimensions(width, height);
+    const float2 texelSize = 1.0f / float2(width, height);
+    
     // 
-    float2 texelSize = 1.0 / float2(1920, 1080); 
+    const float2 offsets[4] =
+    {
+        float2(-0.5f, -0.5f),
+        float2(-0.5f, 0.5f),
+        float2(0.5f, -0.5f),
+        float2(0.5f, 0.5f)
+    };
+    
     
     float4 samplesAvg[4];
-    samplesAvg[0] = AvgTexture.Sample(Sampler, texCoord + float2(-0.5, -0.5) * texelSize);
-    samplesAvg[1] = AvgTexture.Sample(Sampler, texCoord + float2(-0.5, 0.5) * texelSize);
-    samplesAvg[2] = AvgTexture.Sample(Sampler, texCoord + float2(0.5, -0.5) * texelSize);
-    samplesAvg[3] = AvgTexture.Sample(Sampler, texCoord + float2(0.5, 0.5) * texelSize);
-    
     float4 samplesMin[4];
-    samplesMin[0] = MinTexture.Sample(Sampler, texCoord + float2(-0.5, -0.5) * texelSize);
-    samplesMin[1] = MinTexture.Sample(Sampler, texCoord + float2(-0.5, 0.5) * texelSize);
-    samplesMin[2] = MinTexture.Sample(Sampler, texCoord + float2(0.5, -0.5) * texelSize);
-    samplesMin[3] = MinTexture.Sample(Sampler, texCoord + float2(0.5, 0.5) * texelSize);
-    
     float4 samplesMax[4];
-    samplesMax[0] = MaxTexture.Sample(Sampler, texCoord + float2(-0.5, -0.5) * texelSize);
-    samplesMax[1] = MaxTexture.Sample(Sampler, texCoord + float2(-0.5, 0.5) * texelSize);
-    samplesMax[2] = MaxTexture.Sample(Sampler, texCoord + float2(0.5, -0.5) * texelSize);
-    samplesMax[3] = MaxTexture.Sample(Sampler, texCoord + float2(0.5, 0.5) * texelSize);
     
-    // avg
-    output.avg = (samplesAvg[0] + samplesAvg[1] + samplesAvg[2] + samplesAvg[3]) * 0.25;
+    [unroll]
+    for (int i = 0; i < 4; ++i)
+    {
+        const float2 sampleCoord = texCoord + offsets[i] * texelSize;
+        samplesAvg[i] = AvgTexture.Sample(Sampler, sampleCoord);
+        samplesMin[i] = MinTexture.Sample(Sampler, sampleCoord);
+        samplesMax[i] = MaxTexture.Sample(Sampler, sampleCoord);
+    }
+    
+    // calc avg
+    output.avg = (samplesAvg[0] + samplesAvg[1] + samplesAvg[2] + samplesAvg[3]) * 0.25f;
     
     // min
-    output.min = min(min(samplesMin[0], samplesMin[1]), min(samplesMin[2], samplesMin[3]));
+    output.min = samplesMin[0];
+    [unroll]
+    for (int j = 1; j < 4; ++j)
+    {
+        output.min = min(output.min, samplesMin[j]);
+    }
     
     // max
-    output.max = max(max(samplesMax[0], samplesMax[1]), max(samplesMax[2], samplesMax[3]));
+    output.max = samplesMax[0];
+    [unroll]
+    for (int k = 1; k < 4; ++k)
+    {
+        output.max = max(output.max, samplesMax[k]);
+    }
     
     return output;
 }

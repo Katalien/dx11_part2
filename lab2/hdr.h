@@ -30,6 +30,9 @@ public:
         float MinLum;
         float MaxLum;
     };
+
+    bool Resize(ID3D11Device* device, UINT width, UINT height);
+
 private:
     ID3D11Texture2D* m_pHDRTexture;
     ID3D11RenderTargetView* m_pHDRRTV;

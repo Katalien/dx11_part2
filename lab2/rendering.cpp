@@ -160,6 +160,11 @@ bool Renderer::Resize(UINT width, UINT height) {
 
             hr = SetupBackBuffer();
             m_pInput->Resize(width, height);
+
+            // Обновляем HDR-текстуру
+            if (!m_hdr.Resize(m_pDevice, width, height)) {
+                return false;
+            }
         }
         return SUCCEEDED(hr);
     }
@@ -195,6 +200,14 @@ bool Renderer::Render() {
 
 // Вспомогательная функция для рендеринга объекта
 void Renderer::RenderScene() {
+
+    D3D11_VIEWPORT viewport = {};
+    viewport.Width = static_cast<float>(m_width);
+    viewport.Height = static_cast<float>(m_height);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    m_pContext->RSSetViewports(1, &viewport);
+
     m_pContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
     ID3D11Buffer* vertexBuffers[] = { m_pVertexBuffer };
@@ -366,7 +379,7 @@ HRESULT Renderer::InitScene() {
         D3D11_RASTERIZER_DESC desc = {};
         desc.AntialiasedLineEnable = false;
         desc.FillMode = D3D11_FILL_SOLID;
-        desc.CullMode = D3D11_CULL_BACK;
+        desc.CullMode = D3D11_CULL_NONE;
         desc.DepthBias = 0;
         desc.DepthBiasClamp = 0.0f;
         desc.FrontCounterClockwise = false;
@@ -419,7 +432,12 @@ bool Renderer::Frame() {
     m_pCamera->GetBaseViewMatrix(mView);
 
     // Get the projection matrix
-    XMMATRIX mProjection = XMMatrixPerspectiveFovLH(XM_PIDIV2, m_width / (FLOAT)m_height, 0.01f, 100.0f);
+    XMMATRIX mProjection = XMMatrixPerspectiveFovLH(
+        XM_PIDIV4,
+        static_cast<FLOAT>(m_width) / static_cast<FLOAT>(m_height),
+        0.1f,
+        100.0f
+    );
 
     // Update 
     D3D11_MAPPED_SUBRESOURCE subresource;

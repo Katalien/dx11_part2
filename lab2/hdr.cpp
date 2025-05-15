@@ -196,3 +196,42 @@ ID3D11ShaderResourceView* HDR::GetHDRTexture() const {
 ID3D11RenderTargetView* HDR::GetHDRRTV() const {
     return m_pHDRRTV;
 }
+
+bool HDR::Resize(ID3D11Device* device, UINT width, UINT height) {
+   
+    m_brightnessCalc.Release();
+    SAFE_RELEASE(m_pHDRTexture);
+    SAFE_RELEASE(m_pHDRRTV);
+    SAFE_RELEASE(m_pHDRSRV);
+
+  
+    D3D11_TEXTURE2D_DESC textureDesc = {};
+    textureDesc.Width = width;
+    textureDesc.Height = height;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+    HRESULT hr = device->CreateTexture2D(&textureDesc, nullptr, &m_pHDRTexture);
+    if (FAILED(hr)) return false;
+
+    
+    hr = device->CreateRenderTargetView(m_pHDRTexture, nullptr, &m_pHDRRTV);
+    if (FAILED(hr)) return false;
+
+    hr = device->CreateShaderResourceView(m_pHDRTexture, nullptr, &m_pHDRSRV);
+    if (FAILED(hr)) return false;
+
+    
+    m_width = width;
+    m_height = height;
+    m_brightnessCalc.Release();
+    if (!m_brightnessCalc.Init(device, width, height)) {
+        return false;
+    }
+
+    return m_brightnessCalc.Init(device, width, height);
+}
