@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Исходные файлы\input">
+      <UniqueIdentifier>{8321cc20-5745-4edb-8e37-bce4a21a7564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\win">
+      <UniqueIdentifier>{3a1ade13-f056-4c65-b6da-5283dd2eb23a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\units">
+      <UniqueIdentifier>{0603ab9e-c994-4830-bdc9-e858cc3e49cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render">
+      <UniqueIdentifier>{535dcacb-46b4-4541-b903-79999f58d9f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\engine">
+      <UniqueIdentifier>{5ac682d2-4f15-40e5-b4b2-f6129ec5b120}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\shaderManager">
+      <UniqueIdentifier>{0aaed1d0-a701-4280-88fc-d004b7ceb997}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\passes">
+      <UniqueIdentifier>{01e2dfcd-b6d2-427f-915a-225f777b0415}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\shaders">
+      <UniqueIdentifier>{33823f99-8aba-49cd-b0d2-64e4f5edb445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\constantBuffer">
+      <UniqueIdentifier>{b8cb1909-c664-4fab-9c85-452b21a6ee06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\camera">
+      <UniqueIdentifier>{4638e1f7-9d5f-4354-9cff-7a422f4ac011}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\geometry">
+      <UniqueIdentifier>{342f3a2e-f5a3-48d3-aac3-a74a37e25b10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\shaders\inputLayout">
+      <UniqueIdentifier>{4221326f-5952-4230-b91c-b9fda0eb75df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\material">
+      <UniqueIdentifier>{7456d9a5-4cda-4623-ac62-6607ce010833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\mesh">
+      <UniqueIdentifier>{abd1e90e-90cc-42ca-854f-36219b5d1b04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\texture">
+      <UniqueIdentifier>{4b7249ec-cb9c-4ad0-8137-6dd97e339621}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\renderTarget">
+      <UniqueIdentifier>{5ce7e07e-20e8-4328-a2a9-77812e0e5476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\timer">
+      <UniqueIdentifier>{766ea09f-d358-441f-ace7-8c101f8f92bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render\light">
+      <UniqueIdentifier>{387e0342-19c9-4cb6-a578-7df0adf06a97}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="render\Render.h">
+      <Filter>Исходные файлы\render</Filter>
+    </ClInclude>
+    <ClInclude Include="units\UnitBase.h">
+      <Filter>Исходные файлы\units</Filter>
+    </ClInclude>
+    <ClInclude Include="win\Win.h">
+      <Filter>Исходные файлы\win</Filter>
+    </ClInclude>
+    <ClInclude Include="Dev.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Engine.h">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="units\Lab2.h">
+      <Filter>Исходные файлы\units</Filter>
+    </ClInclude>
+    <ClInclude Include="units\TestUnit.h">
+      <Filter>Исходные файлы\units</Filter>
+    </ClInclude>
+    <ClInclude Include="render\shaderManager\ShaderManager.h">
+      <Filter>Исходные файлы\render\shaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="render\passes\PassBase.h">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClInclude>
+    <ClInclude Include="render\passes\TestTriangle.h">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClInclude>
+    <ClInclude Include="render\constantBuffer\ConstantBuffer.h">
+      <Filter>Исходные файлы\render\constantBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="render\constantBuffer\ConstantBufferImpl.hpp">
+      <Filter>Исходные файлы\render\constantBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\shared.h">
+      <Filter>Исходные файлы\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="render\camera\Camera.h">
+      <Filter>Исходные файлы\render\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="render\geometry\GeometryManager.h">
+      <Filter>Исходные файлы\render\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="render\passes\TestCube.h">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClInclude>
+    <ClInclude Include="render\material\MaterialManager.h">
+      <Filter>Исходные файлы\render\material</Filter>
+    </ClInclude>
+    <ClInclude Include="render\mesh\MeshManager.h">
+      <Filter>Исходные файлы\render\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="render\passes\ColorPass.h">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClInclude>
+    <ClInclude Include="input\Input.h">
+      <Filter>Исходные файлы\input</Filter>
+    </ClInclude>
+    <ClInclude Include="render\texture\TextureManager.h">
+      <Filter>Исходные файлы\render\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="render\texture\stb_image.h">
+      <Filter>Исходные файлы\render\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="render\renderTarget\RenderTargetManager.h">
+      <Filter>Исходные файлы\render\renderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="render\passes\AvgBrightness.h">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClInclude>
+    <ClInclude Include="render\passes\ToneMapping.h">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClInclude>
+    <ClInclude Include="units\CameraInputUnit.h">
+      <Filter>Исходные файлы\units</Filter>
+    </ClInclude>
+    <ClInclude Include="timer\Timer.h">
+      <Filter>Исходные файлы\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="render\light\LightManager.h">
+      <Filter>Исходные файлы\render\light</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GoodProj.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Engine.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="win\Win.cpp">
+      <Filter>Исходные файлы\win</Filter>
+    </ClCompile>
+    <ClCompile Include="units\TestUnit.cpp">
+      <Filter>Исходные файлы\units</Filter>
+    </ClCompile>
+    <ClCompile Include="units\Lab2.cpp">
+      <Filter>Исходные файлы\units</Filter>
+    </ClCompile>
+    <ClCompile Include="render\Render.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\shaderManager\ShaderManager.cpp">
+      <Filter>Исходные файлы\render\shaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="render\passes\TestTriangle.cpp">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClCompile>
+    <ClCompile Include="render\geometry\GeometryManager.cpp">
+      <Filter>Исходные файлы\render\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="render\passes\TestCube.cpp">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClCompile>
+    <ClCompile Include="render\material\MaterialManager.cpp">
+      <Filter>Исходные файлы\render\material</Filter>
+    </ClCompile>
+    <ClCompile Include="render\mesh\MeshManager.cpp">
+      <Filter>Исходные файлы\render\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="render\passes\ColorPass.cpp">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClCompile>
+    <ClCompile Include="input\Input.cpp">
+      <Filter>Исходные файлы\input</Filter>
+    </ClCompile>
+    <ClCompile Include="render\texture\TextureManager.cpp">
+      <Filter>Исходные файлы\render\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="render\texture\stb_image.cpp">
+      <Filter>Исходные файлы\render\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="render\renderTarget\RenderTargetManager.cpp">
+      <Filter>Исходные файлы\render\renderTarget</Filter>
+    </ClCompile>
+    <ClCompile Include="render\passes\AvgBrightness.cpp">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClCompile>
+    <ClCompile Include="render\passes\ToneMapping.cpp">
+      <Filter>Исходные файлы\render\passes</Filter>
+    </ClCompile>
+    <ClCompile Include="units\CameraInputUnit.cpp">
+      <Filter>Исходные файлы\units</Filter>
+    </ClCompile>
+    <ClCompile Include="timer\Timer.cpp">
+      <Filter>Исходные файлы\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="render\light\LightManager.cpp">
+      <Filter>Исходные файлы\render\light</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\TestTriangle.hlsl">
+      <Filter>Исходные файлы\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\inputLayout\default.hlsl">
+      <Filter>Исходные файлы\shaders\inputLayout</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\TestCube.hlsl">
+      <Filter>Исходные файлы\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\ColorPass.hlsl">
+      <Filter>Исходные файлы\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\FirstCopyAvgBrightnessPass.hlsl">
+      <Filter>Исходные файлы\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\CopyAvgBrightnessPass.hlsl">
+      <Filter>Исходные файлы\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\ToneMappingPass.hlsl">
+      <Filter>Исходные файлы\shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
