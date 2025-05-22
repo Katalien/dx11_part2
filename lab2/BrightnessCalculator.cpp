@@ -128,13 +128,13 @@ void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderR
                                           level.max.rtv.Get() };
         context->OMSetRenderTargets(3, rtvs, nullptr);
 
-        
+
         const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         context->ClearRenderTargetView(level.avg.rtv.Get(), clearColor);
         context->ClearRenderTargetView(level.min.rtv.Get(), clearColor);
         context->ClearRenderTargetView(level.max.rtv.Get(), clearColor);
 
-        
+
         D3D11_VIEWPORT viewport = {};
         viewport.Width = static_cast<float>(level.avg.width);
         viewport.Height = static_cast<float>(level.avg.height);
@@ -142,7 +142,7 @@ void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderR
         viewport.MaxDepth = 1.0f;
         context->RSSetViewports(1, &viewport);
 
-        
+
         if (i == m_levels.size() - 1) {
             // 1st level
             context->PSSetShader(m_pBrightnessPS.Get(), nullptr, 0);
@@ -160,11 +160,11 @@ void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderR
             context->PSSetShaderResources(0, 3, srvs);
         }
 
-        
+
         context->Draw(4, 0);
     }
 
-   
+
     ID3D11RenderTargetView* nullRTVs[3] = { nullptr, nullptr, nullptr };
     context->OMSetRenderTargets(3, nullRTVs, nullptr);
 

@@ -31,7 +31,7 @@ struct AdaptationBuffer {
 bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     HRESULT hr;
 
-    
+
     D3D11_TEXTURE2D_DESC textureDesc = {};
     textureDesc.Width = width;
     textureDesc.Height = height;
@@ -48,20 +48,20 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     hr = device->CreateTexture2D(&textureDesc, nullptr, &m_pHDRTexture);
     if (FAILED(hr)) return false;
 
-    
+
     hr = device->CreateRenderTargetView(m_pHDRTexture, nullptr, &m_pHDRRTV);
     if (FAILED(hr)) return false;
 
-    
+
     hr = device->CreateShaderResourceView(m_pHDRTexture, nullptr, &m_pHDRSRV);
     if (FAILED(hr)) return false;
 
-    
+
     if (!m_brightnessCalc.Init(device, width, height)) {
         return false;
     }
 
-    
+
     SimpleVertex vertices[] = {
         { XMFLOAT3(-1.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },
         { XMFLOAT3(1.0f, 1.0f, 0.0f),   XMFLOAT2(1.0f, 0.0f) },
@@ -78,7 +78,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     hr = device->CreateBuffer(&vbDesc, &initData, &m_pQuadVB);
     if (FAILED(hr)) return false;
 
-    
+
     ID3DBlob* vsBlob = nullptr;
     hr = D3DCompileFromFile(L"ToneMappingVS.hlsl", nullptr, nullptr,
         "main", "vs_5_0", 0, 0, &vsBlob, nullptr);
@@ -101,7 +101,7 @@ bool HDR::Init(ID3D11Device* device, UINT width, UINT height) {
     }
     if (FAILED(hr)) return false;
 
-    
+
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
@@ -145,26 +145,33 @@ void HDR::Render(ID3D11DeviceContext* context,
     // calc lum
     m_brightnessCalc.Calculate(context, sourceTexture);
 
-    
+
+    D3D11_VIEWPORT viewport = {};
+    viewport.Width = static_cast<float>(m_width);
+    viewport.Height = static_cast<float>(m_height);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    context->RSSetViewports(1, &viewport);
+
     context->OMSetRenderTargets(1, &targetRTV, nullptr);
 
-    
+
     AdaptationBuffer adaptData;
     adaptData.DeltaTime = m_deltaTime;
     adaptData.AdaptationSpeed = 0.05f;
-    adaptData.MinLum = 0.01f;  
-    adaptData.MaxLum = 100.0f; 
+    adaptData.MinLum = 0.01f;
+    adaptData.MaxLum = 100.0f;
 
     D3D11_MAPPED_SUBRESOURCE mapped;
     context->Map(m_pAdaptationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     memcpy(mapped.pData, &adaptData, sizeof(AdaptationBuffer));
     context->Unmap(m_pAdaptationBuffer, 0);
 
-    
+
     context->VSSetShader(m_pToneMappingVS, nullptr, 0);
     context->PSSetShader(m_pToneMappingPS, nullptr, 0);
 
-    
+
     ID3D11ShaderResourceView* srvs[] = {
         sourceTexture,
         m_brightnessCalc.GetAvgSRV(),
@@ -173,18 +180,18 @@ void HDR::Render(ID3D11DeviceContext* context,
     };
     context->PSSetShaderResources(0, 4, srvs);
 
-    
+
     context->PSSetConstantBuffers(0, 1, &m_pAdaptationBuffer);
 
     // Рисуем
-    UINT stride = sizeof(float) * 5; 
+    UINT stride = sizeof(float) * 5;
     UINT offset = 0;
     context->IASetVertexBuffers(0, 1, &m_pQuadVB, &stride, &offset);
     context->IASetInputLayout(m_pInputLayout);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     context->Draw(4, 0);
 
-    
+
     ID3D11ShaderResourceView* nullSRVs[4] = { nullptr, nullptr, nullptr, nullptr };
     context->PSSetShaderResources(0, 4, nullSRVs);
 }
@@ -198,13 +205,13 @@ ID3D11RenderTargetView* HDR::GetHDRRTV() const {
 }
 
 bool HDR::Resize(ID3D11Device* device, UINT width, UINT height) {
-   
+
     m_brightnessCalc.Release();
     SAFE_RELEASE(m_pHDRTexture);
     SAFE_RELEASE(m_pHDRRTV);
     SAFE_RELEASE(m_pHDRSRV);
 
-  
+
     D3D11_TEXTURE2D_DESC textureDesc = {};
     textureDesc.Width = width;
     textureDesc.Height = height;
@@ -218,14 +225,14 @@ bool HDR::Resize(ID3D11Device* device, UINT width, UINT height) {
     HRESULT hr = device->CreateTexture2D(&textureDesc, nullptr, &m_pHDRTexture);
     if (FAILED(hr)) return false;
 
-    
+
     hr = device->CreateRenderTargetView(m_pHDRTexture, nullptr, &m_pHDRRTV);
     if (FAILED(hr)) return false;
 
     hr = device->CreateShaderResourceView(m_pHDRTexture, nullptr, &m_pHDRSRV);
     if (FAILED(hr)) return false;
 
-    
+
     m_width = width;
     m_height = height;
     m_brightnessCalc.Release();

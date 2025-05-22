@@ -3,7 +3,7 @@
 #include <string>
 
 LightManager::LightManager() : m_pLightBuffer(nullptr) {
-    
+
     /*m_lights[0] = { {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
     m_lights[1] = { {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, 1.0f, {} };
     m_lights[2] = { {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}, 1.0f, {} };*/
@@ -31,9 +31,9 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
     //    {}
     //};*/
 
-    m_lights[0] = { {0.2f, 0.0f, 0.0f, 1.0f}, {15.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
-    m_lights[1] = { {0.0f, 0.2f, 0.0f, 1.0f}, {10.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} }; 
-    m_lights[2] = { {0.0f, 0.0f, 0.2f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} }; 
+    m_lights[0] = { {0.2f, 0.0f, 0.0f, 1.0f}, {150.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
+    m_lights[1] = { {0.0f, 0.2f, 0.0f, 1.0f}, {100.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
+    m_lights[2] = { {0.0f, 0.0f, 0.2f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
 
     m_intensityLevels[0] = 1.0f;
     m_intensityLevels[1] = 1.0f;
@@ -48,7 +48,7 @@ void LightManager::Init(ID3D11Device* device) {
     if (!device) return;
 
     D3D11_BUFFER_DESC desc = {};
-    desc.ByteWidth = sizeof(PointLight) * 3;  
+    desc.ByteWidth = sizeof(PointLight) * 3;
     desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -66,14 +66,14 @@ void LightManager::Update(ID3D11DeviceContext* context) {
     context->Unmap(m_pLightBuffer, 0);
 
 #ifdef _DEBUG
-    
-    OutputDebugStringA(("Light 0 Position: (" +
-        std::to_string(m_lights[0].Position.x) + ", " +
-        std::to_string(m_lights[0].Position.y) + ", " +
-        std::to_string(m_lights[0].Position.z) + ")\n").c_str());
+
+    //OutputDebugStringA(("Light 0 Position: (" +
+      //  std::to_string(m_lights[0].Position.x) + ", " +
+      //  std::to_string(m_lights[0].Position.y) + ", " +
+      //  std::to_string(m_lights[0].Position.z) + ")\n").c_str());
 #endif
 
-    
+
     context->PSSetConstantBuffers(2, 1, &m_pLightBuffer);
 }
 
@@ -93,7 +93,7 @@ void LightManager::ToggleLightIntensity(int index) {
     currentLevel = (currentLevel + 1) % 3;
     m_lights[index].Intensity = levels[currentLevel];
 
-//#ifdef _DEBUG
-//    std::cout << "Light " << index << " intensity: " << m_lights[index].Intensity << std::endl;
-//#endif
+    //#ifdef _DEBUG
+    //    std::cout << "Light " << index << " intensity: " << m_lights[index].Intensity << std::endl;
+    //#endif
 }
