@@ -2,6 +2,9 @@
 #include <d3dcompiler.h>
 #include <algorithm>
 
+#include <windows.h>
+#include <sstream>
+
 #pragma comment(lib, "d3dcompiler.lib")
 
 bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHeight) {
@@ -10,6 +13,17 @@ bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHei
     // cepochka
     UINT width = srcWidth;
     UINT height = srcHeight;
+
+    // start downsample
+    DownsampleLevel initialLevel;
+    if (!CreateDownsampleTarget(device, width, height, initialLevel.avg)) return false;
+    if (!CreateDownsampleTarget(device, width, height, initialLevel.min)) return false;
+    if (!CreateDownsampleTarget(device, width, height, initialLevel.max)) return false;
+    m_levels.push_back(initialLevel);
+
+    std::ostringstream oss;
+    oss << "Created downsample target: " << width << " x " << height << "\n";
+    OutputDebugStringA(oss.str().c_str());
 
     while (width > 1 || height > 1) {
         width = std::max<UINT>(width / 2, 1);
@@ -21,7 +35,13 @@ bool BrightnessCalculator::Init(ID3D11Device* device, UINT srcWidth, UINT srcHei
         if (!CreateDownsampleTarget(device, width, height, level.max)) return false;
 
         m_levels.push_back(level);
+    
+        std::ostringstream oss;
+        oss << "Created downsample target: " << width << " x " << height << "\n";
+        OutputDebugStringA(oss.str().c_str());
     }
+
+    
 
     // shaders
     ComPtr<ID3DBlob> vsBlob, psBlob, errorBlob;
@@ -112,28 +132,20 @@ void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderR
     context->IASetInputLayout(nullptr);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-    // 
-    ID3D11SamplerState* samplers[] = { m_pSamplerLinear.Get(),
-                                      m_pSamplerMin.Get(),
-                                      m_pSamplerMax.Get() };
+    ID3D11SamplerState* samplers[] = { m_pSamplerLinear.Get(), m_pSamplerMin.Get(), m_pSamplerMax.Get() };
     context->PSSetSamplers(0, 3, samplers);
 
-    // go by levels
-    for (int i = m_levels.size() - 1; i >= 0; --i) {
+    // reverse
+    for (int i = 0; i < m_levels.size(); ++i) {
         const auto& level = m_levels[i];
 
-        // rtv
-        ID3D11RenderTargetView* rtvs[] = { level.avg.rtv.Get(),
-                                          level.min.rtv.Get(),
-                                          level.max.rtv.Get() };
+        ID3D11RenderTargetView* rtvs[] = { level.avg.rtv.Get(), level.min.rtv.Get(), level.max.rtv.Get() };
         context->OMSetRenderTargets(3, rtvs, nullptr);
-
 
         const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         context->ClearRenderTargetView(level.avg.rtv.Get(), clearColor);
         context->ClearRenderTargetView(level.min.rtv.Get(), clearColor);
         context->ClearRenderTargetView(level.max.rtv.Get(), clearColor);
-
 
         D3D11_VIEWPORT viewport = {};
         viewport.Width = static_cast<float>(level.avg.width);
@@ -142,32 +154,28 @@ void BrightnessCalculator::Calculate(ID3D11DeviceContext* context, ID3D11ShaderR
         viewport.MaxDepth = 1.0f;
         context->RSSetViewports(1, &viewport);
 
-
-        if (i == m_levels.size() - 1) {
-            // 1st level
+        if (i == 0) {
+            // 1st level <- 1 tex
             context->PSSetShader(m_pBrightnessPS.Get(), nullptr, 0);
             ID3D11ShaderResourceView* srvs[] = { srcSRV, srcSRV, srcSRV };
             context->PSSetShaderResources(0, 3, srvs);
         }
         else {
-            // != 1st level
+            // other <- last
             context->PSSetShader(m_pDownsamplePS.Get(), nullptr, 0);
             ID3D11ShaderResourceView* srvs[] = {
-                m_levels[i + 1].avg.srv.Get(),
-                m_levels[i + 1].min.srv.Get(),
-                m_levels[i + 1].max.srv.Get()
+                m_levels[i - 1].avg.srv.Get(),
+                m_levels[i - 1].min.srv.Get(),
+                m_levels[i - 1].max.srv.Get()
             };
             context->PSSetShaderResources(0, 3, srvs);
         }
 
-
         context->Draw(4, 0);
     }
 
-
     ID3D11RenderTargetView* nullRTVs[3] = { nullptr, nullptr, nullptr };
     context->OMSetRenderTargets(3, nullRTVs, nullptr);
-
     ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
     context->PSSetShaderResources(0, 3, nullSRVs);
 }
