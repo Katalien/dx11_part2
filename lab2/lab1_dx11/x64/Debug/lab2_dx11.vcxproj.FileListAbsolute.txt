@@ -1,0 +1,4 @@
+C:\Users\kns_user\Desktop\DX\lab2\x64\Debug\defaultVertexShader.cso
+C:\Users\kns_user\Desktop\DX\lab2\x64\Debug\ToneMapping.cso
+C:\Users\kns_user\Desktop\DX\lab2\x64\Debug\vertexShader.cso
+C:\Users\kns_user\Desktop\DX\lab2\x64\Debug\pixelShader.hlsl

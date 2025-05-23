@@ -39,6 +39,12 @@
     <ClInclude Include="input.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lab1_dx11.cpp">
@@ -51,6 +57,12 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="input.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="hdr.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,6 +81,12 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="vertexShader.hlsl">
+      <Filter>Исходные файлы</Filter>
+    </FxCompile>
+    <FxCompile Include="ToneMapping.hlsl">
+      <Filter>Исходные файлы</Filter>
+    </FxCompile>
+    <FxCompile Include="defaultVertexShader.hlsl">
       <Filter>Исходные файлы</Filter>
     </FxCompile>
   </ItemGroup>
