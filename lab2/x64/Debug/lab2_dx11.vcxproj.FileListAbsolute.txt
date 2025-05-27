@@ -34,3 +34,12 @@ C:\Users\kns_user\Desktop\aaaa\dx11_part2\lab2\x64\Debug\ToneMappingVS.cso
 C:\Users\kns_user\Desktop\aaaa\dx11_part2\lab2\x64\Debug\vertexShader.cso
 C:\Users\kns_user\Desktop\aaaa\dx11_part2\lab2\x64\Debug\pixelShader.hlsl
 C:\Users\kns_user\Desktop\aaaa\dx11_part2\lab2\x64\Debug\lab1_dx11.exe
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\BrightnessPS.cso
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\defaultVertexShader.cso
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\DownsamplePS.cso
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\FullscreenVS.cso
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\ToneMappingPS.cso
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\ToneMappingVS.cso
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\vertexShader.cso
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\pixelShader.hlsl
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\lab1_dx11.exe
