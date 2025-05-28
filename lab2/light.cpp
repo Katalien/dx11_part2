@@ -31,9 +31,9 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
     //    {}
     //};*/
 
-    m_lights[0] = { {3.2f, 0.0f, 0.0f, 1.0f}, {150.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
-    m_lights[1] = { {0.0f, 3.2f, 0.0f, 1.0f}, {100.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
-    m_lights[2] = { {0.0f, 0.0f, 3.2f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
+    m_lights[0] = { {2.7f, 0.0f, 0.0f, 1.0f}, {25.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
+    m_lights[1] = { {0.0f, 2.7f, 0.0f, 1.0f}, {15.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
+    m_lights[2] = { {0.0f, 0.0f, 2.7f, 1.0f}, {10.0f, 0.0f, 0.0f, 1.0f}, 1.0f, {} };
 
     m_intensityLevels[0] = 1.0f;
     m_intensityLevels[1] = 1.0f;

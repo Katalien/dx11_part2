@@ -161,7 +161,7 @@ bool Renderer::Resize(UINT width, UINT height) {
             hr = SetupBackBuffer();
             m_pInput->Resize(width, height);
 
-            // Обновляем HDR-текстуру
+            
             if (!m_hdr.Resize(m_pDevice, width, height)) {
                 return false;
             }
@@ -246,37 +246,37 @@ HRESULT Renderer::InitScene() {
     HRESULT hr = S_OK;
 
     static const Vertex Vertices[] = {
-        // Нижняя грань (Y = -2.0)
+        // low (Y = -2.0)
         { XMFLOAT3(-2.0f, -2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
         { XMFLOAT3(2.0f, -2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
         { XMFLOAT3(2.0f, -2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
         { XMFLOAT3(-2.0f, -2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
 
-        // Верхняя грань (Y = 2.0)
+        // up (Y = 2.0)
         { XMFLOAT3(-2.0f, 2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
         { XMFLOAT3(2.0f, 2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
         { XMFLOAT3(2.0f, 2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
         { XMFLOAT3(-2.0f, 2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 
-        // Правая грань (X = 2.0)
+        // r (X = 2.0)
         { XMFLOAT3(2.0f, -2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
         { XMFLOAT3(2.0f, -2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
         { XMFLOAT3(2.0f,  2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
         { XMFLOAT3(2.0f,  2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
 
-        // Левая грань (X = -2.0)
+        // l (X = -2.0)
         { XMFLOAT3(-2.0f, -2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
         { XMFLOAT3(-2.0f, -2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
         { XMFLOAT3(-2.0f,  2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
         { XMFLOAT3(-2.0f,  2.0f,  2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
 
-        // Передняя грань (Z = 2.0)
+        // f (Z = 2.0)
         { XMFLOAT3(2.0f, -2.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
         { XMFLOAT3(-2.0f, -2.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
         { XMFLOAT3(-2.0f,  2.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
         { XMFLOAT3(2.0f,  2.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
 
-        // Задняя грань (Z = -2.0)
+        // b (Z = -2.0)
         { XMFLOAT3(-2.0f, -2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
         { XMFLOAT3(2.0f, -2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
         { XMFLOAT3(2.0f,  2.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
@@ -285,17 +285,17 @@ HRESULT Renderer::InitScene() {
 
 
     static const USHORT Indices[] = {
-        // Нижняя грань
+        // low
         0, 2, 1, 0, 3, 2,
-        // Верхняя грань
+        // up
         4, 6, 5, 4, 7, 6,
-        // Правая грань
+        // right
         8, 10, 9, 8, 11, 10,
-        // Левая грань
+        // left
         12, 14, 13, 12, 15, 14,
-        // Передняя грань
+        // front
         16, 18, 17, 16, 19, 18,
-        // Задняя грань
+        // back
         20, 22, 21, 20, 23, 22
     };
     static const D3D11_INPUT_ELEMENT_DESC InputDesc[] = {

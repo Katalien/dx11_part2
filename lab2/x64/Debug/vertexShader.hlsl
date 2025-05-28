@@ -13,7 +13,7 @@ struct VS_INPUT
     float3 position : POSITION;
     float4 color : COLOR;
     float2 uv : TEXCOORD0;
-    float3 normal : NORMAL; // Добавляем нормаль
+    float3 normal : NORMAL;
 };
 
 struct VS_OUTPUT
@@ -22,7 +22,7 @@ struct VS_OUTPUT
     float4 color : COLOR;
     float2 uv : TEXCOORD0;
     float3 world_position : TEXCOORD1;
-    float3 normal : NORMAL; // Передаем нормаль в пиксельный шейдер
+    float3 normal : NORMAL;
 };
 
 VS_OUTPUT main(VS_INPUT input)
@@ -34,6 +34,6 @@ VS_OUTPUT main(VS_INPUT input)
     output.world_position = worldPos.xyz;
     output.color = input.color;
     output.uv = input.uv;
-    output.normal = mul((float3x3) mWorldMatrix, input.normal); // Трансформируем нормаль
+    output.normal = mul((float3x3) mWorldMatrix, input.normal);
     return output;
 }
