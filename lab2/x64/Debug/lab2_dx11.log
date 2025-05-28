@@ -1,0 +1,29 @@
+﻿C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\BrightnessPS.hlsl(21,11-43): warning X3206: implicit truncation of vector type
+  
+  compilation object save succeeded; see C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\BrightnessPS.cso
+  compilation object save succeeded; see C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\defaultVertexShader.cso
+  compilation object save succeeded; see C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\DownsamplePS.cso
+  compilation object save succeeded; see C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\FullscreenVS.cso
+  compilation object save succeeded; see C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\ToneMappingPS.cso
+  compilation object save succeeded; see C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\ToneMappingVS.cso
+  compilation object save succeeded; see C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\vertexShader.cso
+  BrightnessCalculator.cpp
+  camera.cpp
+  hdr.cpp
+  input.cpp
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(9,11): warning C4101: point: неиспользованная локальная переменная
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(59,38): warning C4244: аргумент: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(58,38): warning C4244: аргумент: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(73,18): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(74,18): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(75,21): warning C4838: Преобразование из "float" в "LONG" требует сужающего преобразования.
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(75,21): warning C4244: инициализация: преобразование "float" в "LONG", возможна потеря данных
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(75,29): warning C4838: Преобразование из "float" в "LONG" требует сужающего преобразования.
+C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\input.cpp(75,29): warning C4244: инициализация: преобразование "float" в "LONG", возможна потеря данных
+  lab2_dx11.cpp
+  light.cpp
+  rendering.cpp
+  Создание кода...
+  lab2_dx11.vcxproj -> C:\Users\kns_user\Desktop\fixdx\dx11_part2\lab2\x64\Debug\lab1_dx11.exe
+  Скопировано файлов:         1.
+  Скопировано файлов:         1.
