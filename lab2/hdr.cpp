@@ -10,11 +10,15 @@ using namespace DirectX;
 HDR::HDR() : m_pHDRTexture(nullptr), m_pHDRRTV(nullptr), m_pHDRSRV(nullptr), m_pToneMappingPS(nullptr) {}
 
 HDR::~HDR() {
-    if (m_pHDRTexture) m_pHDRTexture->Release();
-    if (m_pHDRRTV) m_pHDRRTV->Release();
-    if (m_pHDRSRV) m_pHDRSRV->Release();
-    if (m_pToneMappingPS) m_pToneMappingPS->Release();
-    if (m_pToneMappingVS) m_pToneMappingVS->Release();
+    SAFE_RELEASE(m_pHDRTexture);
+    SAFE_RELEASE(m_pHDRRTV);
+    SAFE_RELEASE(m_pHDRSRV);
+    SAFE_RELEASE(m_pToneMappingPS);
+    SAFE_RELEASE(m_pToneMappingVS);
+    SAFE_RELEASE(m_pQuadVB);
+    SAFE_RELEASE(m_pInputLayout);
+    SAFE_RELEASE(m_pSampler);
+    SAFE_RELEASE(m_pAdaptationBuffer);
 }
 
 struct SimpleVertex {

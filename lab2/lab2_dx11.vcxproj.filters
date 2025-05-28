@@ -97,10 +97,8 @@
     <FxCompile Include="FullscreenVS.hlsl" />
     <FxCompile Include="DownsamplePS.hlsl" />
     <FxCompile Include="BrightnessPS.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="pixelShader.hlsl">
+    <FxCompile Include="pixelShader.hlsl">
       <Filter>Исходные файлы</Filter>
-    </None>
+    </FxCompile>
   </ItemGroup>
 </Project>
