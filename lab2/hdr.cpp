@@ -9,7 +9,7 @@ using namespace DirectX;
 
 HDR::HDR() : m_pHDRTexture(nullptr), m_pHDRRTV(nullptr), m_pHDRSRV(nullptr), m_pToneMappingPS(nullptr) {}
 
-HDR::~HDR() {
+void HDR::Release() {
     SAFE_RELEASE(m_pHDRTexture);
     SAFE_RELEASE(m_pHDRRTV);
     SAFE_RELEASE(m_pHDRSRV);
@@ -19,6 +19,12 @@ HDR::~HDR() {
     SAFE_RELEASE(m_pInputLayout);
     SAFE_RELEASE(m_pSampler);
     SAFE_RELEASE(m_pAdaptationBuffer);
+    m_brightnessCalc.Release();
+}
+
+
+HDR::~HDR() {
+    Release();
 }
 
 struct SimpleVertex {

@@ -114,6 +114,7 @@ bool Renderer::Init(HINSTANCE hInstance, HWND hWnd) {
 }
 
 void Renderer::Cleanup() {
+
     SAFE_RELEASE(m_pVertexBuffer);
     SAFE_RELEASE(m_pIndexBuffer);
     SAFE_RELEASE(m_pInputLayout);
@@ -126,26 +127,32 @@ void Renderer::Cleanup() {
     SAFE_RELEASE(m_pSwapChain);
     SAFE_RELEASE(m_pContext);
 
+
     if (m_pCamera) {
         m_pCamera->Release();
         delete m_pCamera;
         m_pCamera = nullptr;
     }
+    if (m_pInput) {
+        delete m_pInput;
+        m_pInput = nullptr;
+    }
 
+
+    m_hdr.Release();
+    m_lightManager.Release();
+
+    
 #ifdef _DEBUG
-    if (m_pDevice != nullptr) {
+    if (m_pDevice) {
         ID3D11Debug* pDebug = nullptr;
-        HRESULT hr = m_pDevice->QueryInterface(__uuidof(ID3D11Debug), (void**)&pDebug);
-        assert(SUCCEEDED(hr));
-        if (pDebug != nullptr) {
-            if (pDebug->AddRef() != 3) {
-                pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL);
-            }
+        if (SUCCEEDED(m_pDevice->QueryInterface(IID_PPV_ARGS(&pDebug)))) {
+            pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL);
             pDebug->Release();
-            SAFE_RELEASE(pDebug);
         }
     }
 #endif
+
     SAFE_RELEASE(m_pDevice);
 }
 
