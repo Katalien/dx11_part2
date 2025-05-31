@@ -33,6 +33,8 @@ public:
 
     bool Resize(ID3D11Device* device, UINT width, UINT height);
 
+    void Release();
+
 private:
     ID3D11Texture2D* m_pHDRTexture;
     ID3D11RenderTargetView* m_pHDRRTV;

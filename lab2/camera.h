@@ -8,7 +8,7 @@ public:
 
 
     HRESULT Init();
-    void Release();
+    //void Release();
     void Frame();
     void MouseMoved(float dx, float dy, float wheel);
     void SetMouseSensitivity(float sensitivity);

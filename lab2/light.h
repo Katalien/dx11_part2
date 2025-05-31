@@ -24,6 +24,8 @@ public:
 
     ID3D11Buffer* GetLightBuffer() const { return m_pLightBuffer; }
 
+    void Release();
+
 private:
     ID3D11Buffer* m_pLightBuffer;
     PointLight m_lights[3];

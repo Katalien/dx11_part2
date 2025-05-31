@@ -80,9 +80,9 @@ void Camera::KeyPressed(char key) {
     }
 }
 
-void Camera::Release() {
+/*void Camera::Release() {
     if (m_pContext) {
         m_pContext->Release();
         m_pContext = nullptr;
     }
-}
+}*/

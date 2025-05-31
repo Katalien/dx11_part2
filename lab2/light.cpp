@@ -1,6 +1,8 @@
 #include "light.h"
 #include <assert.h>
 #include <string>
+#define SAFE_RELEASE(a) if (a != NULL) { a->Release(); a = NULL; }
+
 
 LightManager::LightManager() : m_pLightBuffer(nullptr) {
 
@@ -41,7 +43,7 @@ LightManager::LightManager() : m_pLightBuffer(nullptr) {
 }
 
 LightManager::~LightManager() {
-    if (m_pLightBuffer) m_pLightBuffer->Release();
+    Release();
 }
 
 void LightManager::Init(ID3D11Device* device) {
@@ -96,4 +98,8 @@ void LightManager::ToggleLightIntensity(int index) {
     //#ifdef _DEBUG
     //    std::cout << "Light " << index << " intensity: " << m_lights[index].Intensity << std::endl;
     //#endif
+}
+
+void LightManager::Release() {
+    SAFE_RELEASE(m_pLightBuffer);
 }
