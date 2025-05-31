@@ -115,6 +115,10 @@ bool Renderer::Init(HINSTANCE hInstance, HWND hWnd) {
 
 void Renderer::Cleanup() {
 
+
+    m_hdr.Release();
+    m_lightManager.Release();
+
     SAFE_RELEASE(m_pVertexBuffer);
     SAFE_RELEASE(m_pIndexBuffer);
     SAFE_RELEASE(m_pInputLayout);
@@ -125,11 +129,11 @@ void Renderer::Cleanup() {
     SAFE_RELEASE(m_pPixelShader);
     SAFE_RELEASE(m_pBackBufferRTV);
     SAFE_RELEASE(m_pSwapChain);
-    SAFE_RELEASE(m_pContext);
+
 
 
     if (m_pCamera) {
-        m_pCamera->Release();
+        //m_pCamera->Release();
         delete m_pCamera;
         m_pCamera = nullptr;
     }
@@ -139,9 +143,7 @@ void Renderer::Cleanup() {
     }
 
 
-    m_hdr.Release();
-    m_lightManager.Release();
-
+    SAFE_RELEASE(m_pContext);
     
 #ifdef _DEBUG
     if (m_pDevice) {

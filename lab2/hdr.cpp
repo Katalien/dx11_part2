@@ -250,5 +250,7 @@ bool HDR::Resize(ID3D11Device* device, UINT width, UINT height) {
         return false;
     }
 
-    return m_brightnessCalc.Init(device, width, height);
+    return true;
 }
+
+
