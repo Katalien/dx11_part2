@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>D:\test_dx11_maks\lab1\x64\Debug\lab1_dx11.exe</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles>
+    <ContentFile>
+      <FullPath>D:\test_dx11_maks\lab1\x64\Debug\ToneMapping.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>D:\test_dx11_maks\lab1\x64\Debug\vertexShader.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>D:\test_dx11_maks\lab1\pixelShader.hlsl</FullPath>
+    </ContentFile>
+  </ContentFiles>
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

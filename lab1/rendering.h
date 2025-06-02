@@ -8,6 +8,8 @@
 #include "Vertex.hpp"
 #include "camera.h"
 #include "input.h"
+#include "hdr.h"
+#include "light.h"
 
 using namespace DirectX;
 
@@ -22,13 +24,25 @@ struct SceneMatrixBuffer {
 class Renderer {
 public:
 
+    Camera* GetCamera() const {
+        return m_pCamera;
+    }
+
     bool Init(HINSTANCE hInstance, HWND hWnd);
     bool Frame();
     bool Resize(UINT width, UINT height);
     void Cleanup();
     bool Render();
 
+    void HandleMouseWheel(float delta) {
+        if (m_pCamera) {
+            m_pCamera->MouseMoved(0.0f, 0.0f, delta); // Передаём только прокрутку
+        }
+    }
+
 private:
+
+
     HRESULT InitScene();
     HRESULT SetupBackBuffer();
 
@@ -53,4 +67,7 @@ private:
 
     Camera* m_pCamera = nullptr;
     Input* m_pInput = nullptr;
+
+    LightManager m_lightManager;
+    HDR m_hdr;
 };
