@@ -57,10 +57,6 @@ void Lab3::init()
 		mat->getData().metalness = min(1.0 * (i / H) * (maxMetalness - minMetalness) / (W - 1) + minMetalness, maxMetalness);
 		mat->getData().roughness = min(1.0 * (i % W) * (maxRoughness - minRoughness) / (H - 1) + minRoughness, maxRoughness);;
 	
-		mat->getData().reflection.x = mat->getData().metalness;
-		mat->getData().reflection.y = mat->getData().metalness;
-		mat->getData().reflection.z = mat->getData().metalness;
-
 		mat->setTexture(texture, MaterialTextureType_Color);
 		materials.push_back(mat);
 	}

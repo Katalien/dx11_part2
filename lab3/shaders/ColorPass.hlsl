@@ -107,7 +107,7 @@ float4 CountNDFColor(VSOut input, float3 v) {
 
 float3 CountFresnelFunc(VSOut input, float3 v, float3 l) {
 	float3 h = normalize(v + l);
-	float3 f0 = float3(0.04f, 0.04f, 0.04f) * (1 - materialData.metalness) + materialData.reflection * materialData.metalness;
+	float3 f0 = float3(0.04f, 0.04f, 0.04f) * (1 - materialData.metalness) + TextureColor.Sample(LinearSampler, input.texCoord) * materialData.metalness;
 	return (f0 + (float3(1.0, 1.0, 1.0) - f0) * pow(1 - max(dot(h, v), 0.0), 5));
 }
 
@@ -115,7 +115,7 @@ float4 CountFFColor(VSOut input, float3 v) {
 	float4 result = float4(0, 0, 0, 1);
 	for (int i = 0; i < lightsData.pointAmount; i++) {
 		float3 l = normalize(lightsData.pointLights[i].position - input.worldPos);
-		result.xyz += dot(input.normal, l) < 0 ? float3(0, 0, 0) : CountFresnelFunc(input, v, l) * TextureColor.Sample(LinearSampler, input.texCoord);
+		result.xyz += dot(input.normal, l) < -0.01 ? float3(0, 0, 0) : CountFresnelFunc(input, v, l);
 	}
 	return result;
 }

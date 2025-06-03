@@ -80,7 +80,7 @@ struct PerMaterialData
 	float3 specular;
 	float metalness;
 	float roughness;
-	float3 reflection;
+	float3 _padding;
 };
 
 struct PerFrameData
