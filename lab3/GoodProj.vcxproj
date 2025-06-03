@@ -211,6 +211,7 @@
     <ClInclude Include="units\CameraInputUnit.h" />
     <ClInclude Include="units\Lab2.h" />
     <ClInclude Include="units\Lab3.h" />
+    <ClInclude Include="units\Lab4.h" />
     <ClInclude Include="units\Sky.h" />
     <ClInclude Include="units\TestUnit.h" />
     <ClInclude Include="units\UnitBase.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="units\CameraInputUnit.cpp" />
     <ClCompile Include="units\Lab2.cpp" />
     <ClCompile Include="units\Lab3.cpp" />
+    <ClCompile Include="units\Lab4.cpp" />
     <ClCompile Include="units\Sky.cpp" />
     <ClCompile Include="units\TestUnit.cpp" />
     <ClCompile Include="win\Win.cpp" />

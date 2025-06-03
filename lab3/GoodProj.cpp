@@ -6,6 +6,7 @@
 #include "units/TestUnit.h"
 #include "units/Lab2.h"
 #include "units/Lab3.h"
+#include "units/Lab4.h"
 #include "units/Sky.h"
 #include "units/CameraInputUnit.h"
 
@@ -18,6 +19,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //    eng.addUnit(new TestUnit());
     eng.addUnit(new Lab3());
     eng.addUnit(new Sky());
+//    eng.addUnit(new Lab4());
     eng.addUnit(new CameraInputUnit());
 
     eng.init(hInstance);

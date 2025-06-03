@@ -49,6 +49,9 @@ using uint4 = DirectX::XMUINT4;
 #define SHADE_MODEL_GF 3
 #define SHADE_MODEL_FF 4
 #define SHADE_MODEL_PBR 5
+#define SHADE_MODEL_PBR_IRR_DIFF 6
+#define SHADE_MODEL_PBR_IRR_SPEC 7
+#define SHADE_MODEL_PBR_IRR_DIFF_SPEC 8
 
 #ifdef __cplusplus
 #pragma pack(push, 1)

@@ -1,36 +1,37 @@
-#include "Lab3.h"
+#include "Lab4.h"
 
-const char* Lab3::imguiShadeModels[] = {
+const char* Lab4::imguiShadeModels[] = {
 	"Color",
 	"Phong",
 	"Normal Distribution Function",
 	"Geometry Function",
 	"Fresnel Function",
-	"PBR"
+	"PBR",
+	"PBR With Irradiance - Diffusion",
+	"PBR With Irradiance - Specular",
+	"PBR With Irradiance - Diffusion and Specular"
 };
 
-const char* Lab3::textureFilePaths[] = {
+const char* Lab4::textureFilePaths[] = {
 	"bin/textures/GoodTexture.jpg",
 	"bin/textures/BlackTexture.png",
-	"bin/textures/OrangeTexture.jpg",
 	"bin/textures/DoomTexture.jpg"
 };
 
-const char* Lab3::textureNames[] = {
+const char* Lab4::textureNames[] = {
 	"GoodTexture",
 	"BlackTexture",
-	"OrangeTexture",
 	"DoomTexture"
 };
 
-Lab3::Lab3() {
+Lab4::Lab4() {
 
 }
 
-void Lab3::init()
+void Lab4::init()
 {
 	selectedShadeModel = 5;
-	selectedTexture = 2;
+	selectedTexture = 1;
 
 	texture = engine->getRender()->getTextureManager()->loadTexture(textureFilePaths[selectedTexture], true, true);
 
@@ -88,7 +89,7 @@ void Lab3::init()
 	meshes.push_back(mesh);
 }
 
-void Lab3::update() {
+void Lab4::update() {
 	ImGui::Begin("Lab3");
 
 	ImGui::Text("Controls:\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n", 
@@ -130,7 +131,7 @@ void Lab3::update() {
 	ImGui::End();
 }
 
-Lab3::~Lab3() {
+Lab4::~Lab4() {
 }
 
 

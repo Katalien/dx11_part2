@@ -108,14 +108,14 @@ float4 CountNDFColor(VSOut input, float3 v) {
 float3 CountFresnelFunc(VSOut input, float3 v, float3 l) {
 	float3 h = normalize(v + l);
 	float3 f0 = float3(0.04f, 0.04f, 0.04f) * (1 - materialData.metalness) + materialData.reflection * materialData.metalness;
-	return f0 + (1 - f0) * pow(1 - dot(h, v), 5);
+	return (f0 + (float3(1.0, 1.0, 1.0) - f0) * pow(1 - max(dot(h, v), 0.0), 5));
 }
 
 float4 CountFFColor(VSOut input, float3 v) {
 	float4 result = float4(0, 0, 0, 1);
 	for (int i = 0; i < lightsData.pointAmount; i++) {
 		float3 l = normalize(lightsData.pointLights[i].position - input.worldPos);
-		result.xyz += dot(input.normal, l) < 0 ? float3(0, 0, 0) : CountFresnelFunc(input, v, l);
+		result.xyz += dot(input.normal, l) < 0 ? float3(0, 0, 0) : CountFresnelFunc(input, v, l) * TextureColor.Sample(LinearSampler, input.texCoord);
 	}
 	return result;
 }
@@ -161,6 +161,23 @@ float4 CountPBRColor(VSOut input, float3 v) {
 	return result;
 }
 
+float4 CountPBRWithIrradianceDiffusion(VSOut input, float3 v) {
+	float4 color = float4(1, 0, 1, 1);
+	return color;
+}
+
+float4 CountPBRWithIrradianceSpecular(VSOut input, float3 v) {
+	// not implemented
+	float4 color = float4(1, 0, 1, 1);
+	return color;
+}
+
+float4 CountPBRWithIrradianceDiffusionAndSpecular(VSOut input, float3 v) {
+	// not implemented
+	float4 color = float4(1, 0, 1, 1);
+	return color;
+}
+
 float4 PSMain(VSOut input) : SV_TARGET{
 	input.normal = normalize(input.normal);
 	float3 view = normalize(frameData.cameraPos - input.worldPos);
@@ -197,6 +214,21 @@ float4 PSMain(VSOut input) : SV_TARGET{
 		case SHADE_MODEL_PBR:
 		{
 			color = CountPBRColor(input, view);
+			break;
+		}
+		case SHADE_MODEL_PBR_IRR_DIFF:
+		{
+			color = CountPBRWithIrradianceDiffusion(input, view);
+			break;
+		}
+		case SHADE_MODEL_PBR_IRR_SPEC:
+		{
+			color = CountPBRWithIrradianceSpecular(input, view);
+			break;
+		}
+		case SHADE_MODEL_PBR_IRR_DIFF_SPEC:
+		{
+			color = CountPBRWithIrradianceDiffusionAndSpecular(input, view);
 			break;
 		}
 		default:

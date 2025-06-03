@@ -181,6 +181,9 @@
     <ClInclude Include="render\passes\SkyPass.h">
       <Filter>Исходные файлы\render\passes</Filter>
     </ClInclude>
+    <ClInclude Include="units\Lab4.h">
+      <Filter>Исходные файлы\units</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GoodProj.cpp">
@@ -278,6 +281,9 @@
     </ClCompile>
     <ClCompile Include="render\passes\SkyPass.cpp">
       <Filter>Исходные файлы\render\passes</Filter>
+    </ClCompile>
+    <ClCompile Include="units\Lab4.cpp">
+      <Filter>Исходные файлы\units</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
